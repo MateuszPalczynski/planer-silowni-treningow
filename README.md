@@ -1,1 +1,1 @@
-# Planer-silowni-trening-w
+# Planer-silowni-treningow
