@@ -13,7 +13,7 @@ Opcja 1: Flask
 Opcja 2: Django
 
 Decyzja
-Flask i Django to dwa popularne frameworki do tworzenia aplikacji webowych w języku Python. 
+Flask i Django to dwa popularne frameworki do tworzenia aplikacji webowych w języku Python. Za użyciem Django przemówiły intuicyjne stosowanie logowania oraz inne cechy przyspieszające tworzenie projektu, które nie są obecne we Flasku.
 
 Konsekwencje
 Django zostanie wykorzystany w rozwoju naszego projektu
