@@ -35,3 +35,33 @@ h1 {
 .register {
     background-color: #008CBA;
 }
+
+.container form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.container form div {
+    margin-bottom: 15px;
+}
+
+.container form input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.container form button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.container form ul.errorlist {
+    color: red;
+    list-style: none;
+    padding: 0;
+    margin: 5px 0;
+}
