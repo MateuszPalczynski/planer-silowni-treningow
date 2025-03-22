@@ -2,19 +2,9 @@
 
 {% block content %}
   <h2>Login</h2>
-  {% if messages %}
-    {% for message in messages %}
-        <p style="color: red;">{{ message }}</p>
-    {% endfor %}
-  {% endif %}
   <form method="post">
     {% csrf_token %}
-    <label>Username:</label>
-    <input type="text" name="username" required>
-    <br>
-    <label>Password:</label>
-    <input type="password" name="password" required>
-    <br>
+    {{ form.as_p }}
     <button type="submit">Login</button>
   </form>
   <p>Want to create an account <a href="{% url 'register' %}">Register</a></p>
