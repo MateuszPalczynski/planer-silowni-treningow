@@ -1,12 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import LoginView
-from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
-
-# Widok logowania
-class LoginPageView(LoginView):
-    template_name = 'login.html'
 
 # Widok rejestracji
 def register(request):
@@ -15,10 +10,14 @@ def register(request):
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
-            messages.success(request, f'Konto zostało utworzone dla {username}!')
-            return redirect('login')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            auth_login(request, user)
+            messages.success(request, f'Konto zostało utworzone dla {username}! Jesteś teraz zalogowany.')
+            return redirect('home')
         else:
-            messages.error(request, 'Błąd podczas rejestracji. Spróbuj ponownie.')
+            for error in list(form.errors.values()):
+                messages.error(request, error)
     else:
         form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
@@ -29,14 +28,12 @@ def home(request):
 
 def login(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
             return redirect('home')
-        else:
-            messages.error(request, "Invalid username or password")
+    else:
+        form = AuthenticationForm()
     
-    return render(request, 'login.html')
+    return render(request, 'login.html', {'form': form})
