@@ -1,30 +1,29 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-  <div class="container">
+  <div class="register-container">
     <h2>Rejestracja</h2>
+    
     {% if messages %}
-      {% for message in messages %}
-        <p style="color: {% if message.tags == 'success' %}green{% else %}red{% endif %};">
-          {{ message }}
-        </p>
-      {% endfor %}
-    {% endif %}
-    <form method="post">
-      {% csrf_token %}
-      {% for field in form %}
-        <div>
-          {{ field.label_tag }}
-          {{ field }}
-          {% if field.errors %}
-            {% for error in field.errors %}
-              <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-          {% endif %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
         </div>
-      {% endfor %}
-      <button type="submit" class="button register">Zarejestruj się</button>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="post" class="register-form">
+      {% csrf_token %}
+      
+      {{ form.as_p }}
+      
+      <button type="submit" class="btn-register">Zarejestruj się</button>
     </form>
-    <p>Masz już konto? <a href="{% url 'login' %}">Zaloguj się</a></p>
+    
+    <div class="login-link">
+      Masz już konto? <a href="{% url 'login' %}">Zaloguj się</a>
+    </div>
   </div>
 {% endblock %}
