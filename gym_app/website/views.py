@@ -8,8 +8,16 @@ def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')  # Przekierowanie do strony logowania po rejestracji
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            messages.success(request, f'Konto zostało utworzone dla {username}! Jesteś teraz zalogowany.')
+            return redirect('home')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
     else:
         form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
@@ -29,5 +37,3 @@ def login(request):
         form = AuthenticationForm()
     
     return render(request, 'login.html', {'form': form})
-
-
