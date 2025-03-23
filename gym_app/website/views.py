@@ -11,22 +11,28 @@ def register(request):
             user = form.save()
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            messages.success(request, f'Konto zostało utworzone dla {username}! Jesteś teraz zalogowany.')
-            return redirect('home')
+            
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Konto zostało utworzone dla {username}! Jesteś teraz zalogowany.')
+                return redirect('home')
+            else:
+                messages.error(request, "Wystąpił problem z automatycznym logowaniem.")
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
+    
     else:
         form = UserCreationForm()
+    
     return render(request, 'register.html', {'form': form})
 
 def home(request):
     return render(request, 'home.html')
 
 
-def login(request):
+def user_login(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
