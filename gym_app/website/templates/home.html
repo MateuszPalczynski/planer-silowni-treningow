@@ -1,11 +1,18 @@
 {% extends 'base_generic.html' %}
 
-
 {% block content %}
     <div class="container">
         <h1>Gym App</h1>
-        <a href="/login" class="button login">Login</a>
-        <a href="/register" class="button register">Register</a>
+
+        {% if user.is_authenticated %}
+            <p>Witaj, {{ user.username }}!</p>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="button logout">Wyloguj się</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}" class="button login">Zaloguj się</a>
+            <a href="{% url 'register' %}" class="button register">Zarejestruj się</a>
+        {% endif %}
     </div>
 {% endblock %}
-
