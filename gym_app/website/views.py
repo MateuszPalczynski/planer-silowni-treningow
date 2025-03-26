@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from .forms import TrainingPlanForm
 
 # Widok rejestracji
 def register(request):
@@ -29,7 +30,8 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 def home(request):
-    return render(request, 'home.html')
+    form = TrainingPlanForm(request.POST)
+    return render(request, 'home.html', {'form':form})
 
 
 def user_login(request):
@@ -43,3 +45,17 @@ def user_login(request):
         form = AuthenticationForm()
     
     return render(request, 'login.html', {'form': form})
+
+def create_training_plan(request):
+    if request.method == 'POST':
+        form = TrainingPlanForm(request.POST, user=request.user)
+        if form.is_valid():
+            trainig_plan = form.save(commit=False)
+            trainig_plan.user = request.user  # Przypisanie user_id
+            trainig_plan.save()
+            form.save_m2m()  
+            return redirect('home')  # Zmień na swoją stronę
+    else:
+        form = TrainingPlanForm(user=request.user)
+
+    return render(request, 'workout_plan_form.html', {'form': form})
