@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .forms import TrainingPlanForm
+from .models import TrainingPlan
 
 # Widok rejestracji
 def register(request):
@@ -31,7 +32,17 @@ def register(request):
 
 def home(request):
     form = TrainingPlanForm(request.POST)
-    return render(request, 'home.html', {'form':form})
+    training_plans = []
+    
+    if request.user.is_authenticated:
+        training_plans = TrainingPlan.objects.filter(user=request.user)
+    
+    context = {
+        'form': form,
+        'training_plans': training_plans
+    }
+    
+    return render(request, 'home.html', context)
 
 
 def user_login(request):
