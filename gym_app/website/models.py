@@ -13,5 +13,5 @@ class TrainingPlan(models.Model):
     name = models.CharField(max_length=255)  # Nazwa planu treningowego
     exercises = models.ManyToManyField(Exercise)
     
-    def __str__(self):
-        return f'{self.name} ({self.exercises})'
+   def __str__(self):
+        return f'{self.name} (użytkownik: {self.user.username})'
