@@ -14,17 +14,17 @@ aby mieć dostęp do swojego spersonalizowanego planera treningów.~~
 chcę móc dodać swój plan treningowy,
 aby mieć uporządkowane ćwiczenia do wykonania w konkretnych dniach tygodnia.**
 
-Jako użytkownik
+**Jako użytkownik
 chcę móc edytować i usuwać ćwiczenia w planie treningowym,
-aby dostosować go do moich aktualnych potrzeb i postępów.
+aby dostosować go do moich aktualnych potrzeb i postępów.**
 
 Jako użytkownik
 chcę mieć możliwość zapisania historii swoich treningów,
 aby móc śledzić postępy i analizować swoje osiągnięcia.
 
-Jako użytkownik
+**Jako użytkownik
 chcę móc określić poziom intensywności treningu i liczbę powtórzeń dla każdego ćwiczenia,
-aby lepiej dostosować plan do swoich możliwości.
+aby lepiej dostosować plan do swoich możliwości.**
 
 Jako użytkownik
 chcę móc generować raporty z wykonanych treningów,
