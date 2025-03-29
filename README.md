@@ -2,13 +2,13 @@
 
 Planer siłowni i treningów
 
-Jako administrator
+~~Jako administrator
 Chcę mieć możliwość zarządzania użytkownikami
-By mogli korzystać z systemu
+By mogli korzystać z systemu~~
 
-Jako użytkownik
+~~Jako użytkownik
 chcę móc założyć konto i zalogować się do systemu,
-aby mieć dostęp do swojego spersonalizowanego planera treningów.
+aby mieć dostęp do swojego spersonalizowanego planera treningów.~~
 
 Jako użytkownik
 chcę móc dodać swój plan treningowy,
