@@ -3,6 +3,8 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .forms import TrainingPlanForm
+from django.shortcuts import render, redirect
+
 
 # Widok rejestracji
 def register(request):
@@ -12,7 +14,7 @@ def register(request):
             user = form.save()
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
-            
+
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -23,15 +25,16 @@ def register(request):
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
-    
+
     else:
         form = UserCreationForm()
-    
+
     return render(request, 'register.html', {'form': form})
+
 
 def home(request):
     form = TrainingPlanForm(request.POST)
-    return render(request, 'home.html', {'form':form})
+    return render(request, 'home.html', {'form': form})
 
 
 def user_login(request):
@@ -43,8 +46,9 @@ def user_login(request):
             return redirect('home')
     else:
         form = AuthenticationForm()
-    
+
     return render(request, 'login.html', {'form': form})
+
 
 def create_training_plan(request):
     if request.method == 'POST':
@@ -53,7 +57,7 @@ def create_training_plan(request):
             trainig_plan = form.save(commit=False)
             trainig_plan.user = request.user  # Przypisanie user_id
             trainig_plan.save()
-            form.save_m2m()  
+            form.save_m2m()
             return redirect('home')  # Zmień na swoją stronę
     else:
         form = TrainingPlanForm(user=request.user)

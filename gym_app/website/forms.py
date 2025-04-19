@@ -9,9 +9,15 @@ class TrainingPlanForm(forms.ModelForm):
         required=True
     )
 
+    intensity = forms.ChoiceField(
+        choices=TrainingPlan.INTENSITY_CHOICES,
+        initial='medium',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Level of Intensity'
+    )
     class Meta:
         model = TrainingPlan
-        fields = ['name', 'exercises']
+        fields = ['name', 'exercises', 'intensity']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Pobranie użytkownika
