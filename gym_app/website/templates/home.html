@@ -27,10 +27,15 @@
 
         <form id="trainingPlanForm" method="POST" action="{% url 'create_training_plan' %}">
             {% csrf_token %}
+
             <label>Plan Name:</label>
             {{ form.name }}
             <label>Choose Exercises:</label>
             {{ form.exercises }}
+
+            <label>Level of Intensity:</label>
+              {{ form.intensity }}
+
             <button type="submit">Save Plan</button>
         </form>
     </div>
