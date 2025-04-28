@@ -1,39 +1,23 @@
-// Function to show the popup
-function showPopup() {
-    document.getElementById('popup').style.display = 'block';
+document.addEventListener('DOMContentLoaded', () => {
+  const popup = document.getElementById('popup');
+  const openBtn = document.getElementById('openPopupBtn');
+  const closeBtn = document.getElementById('closePopupBtn');
+
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      popup.style.display = 'block';
+    });
   }
-  
-  // Function to close the popup
-  function closePopup() {
-    document.getElementById('popup').style.display = 'none';
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
   }
-  
-  // Close the popup when the user clicks outside of it
-  window.onclick = function(event) {
-    if (event.target === document.getElementById('popup')) {
-      closePopup();
+
+  window.addEventListener('click', (event) => {
+    if (event.target === popup) {
+      popup.style.display = 'none';
     }
-  }
-
- // Pobranie elementów
- const popup = document.getElementById('popup');
- const openPopupBtn = document.getElementById('openPopupBtn');
- const closePopupBtn = document.getElementById('closePopupBtn');
-
- // Funkcja otwierająca popup
- openPopupBtn.onclick = function() {
-   popup.style.display = 'block';
- };
-
- // Funkcja zamykająca popup
- closePopupBtn.onclick = function() {
-   popup.style.display = 'none';
- };
-
- // Zamknięcie popupu, jeśli użytkownik kliknie poza jego obszar
- window.onclick = function(event) {
-   if (event.target == popup) {
-     popup.style.display = 'none';
-   }
- };
-  
+  });
+});
