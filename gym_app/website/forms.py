@@ -15,9 +15,17 @@ class TrainingPlanForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-select'}),
         label='Level of Intensity'
     )
+    
+    training_days = forms.MultipleChoiceField(
+        choices=TrainingPlan.DAYS_OF_WEEK,
+        widget=forms.CheckboxSelectMultiple,
+        label='Training Days',
+        required=True
+    )
+
     class Meta:
         model = TrainingPlan
-        fields = ['name', 'exercises', 'intensity']
+        fields = ['name', 'exercises', 'intensity', 'training_days']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Pobranie użytkownika

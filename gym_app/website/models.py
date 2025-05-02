@@ -16,6 +16,16 @@ class TrainingPlan(models.Model):
         ('medium', 'Medium'),
         ('high', 'High'),
     ]
+    
+    DAYS_OF_WEEK = [
+        ('mon', 'Monday'),
+        ('tue', 'Tuesday'),
+        ('wed', 'Wednesday'),
+        ('thu', 'Thursday'),
+        ('fri', 'Friday'),
+        ('sat', 'Saturday'),
+        ('sun', 'Sunday'),
+    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Powiązanie z użytkownikiem
     name = models.CharField(max_length=255)  # Nazwa planu treningowego
@@ -25,6 +35,9 @@ class TrainingPlan(models.Model):
         choices=INTENSITY_CHOICES,
         default='medium',
     )
+    training_days = models.JSONField(default=list)
 
     def __str__(self):
-        return f'{self.name} ({self.get_intensity_display()})'
+        days = ', '.join(self.trainingDays).title() if self.trainingDays else 'No days set'
+        return f'{self.name} - {self.get_intensity_display()} Intensity, Training Days: {days}'
+
