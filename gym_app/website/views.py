@@ -57,6 +57,7 @@ def user_login(request):
     
     return render(request, 'login.html', {'form': form})
 
+
 def create_training_plan(request):
     if request.method == 'POST':
         form = TrainingPlanForm(request.POST, user=request.user)
@@ -65,6 +66,7 @@ def create_training_plan(request):
             trainig_plan.user = request.user  # Przypisanie user_id
             trainig_plan.save()
             form.save_m2m()  
+            
             return redirect('home')  # Zmień na swoją stronę
     else:
         form = TrainingPlanForm(user=request.user)
