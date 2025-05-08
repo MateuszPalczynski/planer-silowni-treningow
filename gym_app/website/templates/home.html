@@ -21,7 +21,7 @@
 {% endif %}
 
 <div id="popup" class="popup" style="display: none;">
-    <div class="popup-content">
+    <div class="popup-content" style="max-height: 60vh; overflow-y: auto;">
         <span class="close" id="closePopupBtn">&times;</span>
         <h2>Create a New Training Plan</h2>
 
@@ -30,12 +30,15 @@
 
             <label>Plan Name:</label>
             {{ form.name }}
+
             <label>Choose Exercises:</label>
             {{ form.exercises }}
 
             <label>Level of Intensity:</label>
-              {{ form.intensity }}
+            {{ form.intensity }}
 
+            <label>Days of week:</label>
+            {{ form.training_days }}
             <button type="submit">Save Plan</button>
         </form>
     </div>

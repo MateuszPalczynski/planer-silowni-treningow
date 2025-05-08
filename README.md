@@ -10,9 +10,9 @@ By mogli korzystać z systemu~~
 chcę móc założyć konto i zalogować się do systemu,
 aby mieć dostęp do swojego spersonalizowanego planera treningów.~~
 
-**Jako użytkownik
+~~Jako użytkownik
 chcę móc dodać swój plan treningowy,
-aby mieć uporządkowane ćwiczenia do wykonania w konkretnych dniach tygodnia.**
+aby mieć uporządkowane ćwiczenia do wykonania w konkretnych dniach tygodnia.~~
 
 **Jako użytkownik
 chcę móc edytować i usuwać ćwiczenia w planie treningowym,
