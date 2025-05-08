@@ -18,7 +18,7 @@ class TrainingPlanForm(forms.ModelForm):
     
     training_days = forms.MultipleChoiceField(
         choices=TrainingPlan.DAYS_OF_WEEK,
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.SelectMultiple,
         label='Training Days',
         required=True
     )
