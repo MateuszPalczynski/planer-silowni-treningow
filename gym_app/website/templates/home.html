@@ -16,7 +16,7 @@
             <a href="{% url 'register' %}" class="button register">Zarejestruj się</a>
         {% endif %}
     </div>
-    
+
     {% if user.is_authenticated %}
         <!-- Sekcja z planami treningowymi -->
         <div class="training-plans-section">
@@ -60,4 +60,5 @@
         </div>
       </div>
     </div>
+
 {% endblock %}
