@@ -1,9 +1,8 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-
-    <div class="container">
-        <h1>Gym App</h1>
+<div class="container">
+    <h1>Gym App</h1>
 
         {% if user.is_authenticated %}
             <p>Witaj, {{ user.username }}!</p>
@@ -16,48 +15,72 @@
             <a href="{% url 'register' %}" class="button register">Zarejestruj się</a>
         {% endif %}
     </div>
-
+        {% if user.is_authenticated %}
+        <button class="button add_plan" id="openPopupBtn"  type="button">Add Training Plan</button>
+        {% else %}
+    {% endif %}
+    </div>
     {% if user.is_authenticated %}
-        <!-- Sekcja z planami treningowymi -->
-        <div class="training-plans-section">
-            <h2>Twoje plany treningowe</h2>
-            {% if training_plans %}
-                <div class="training-plans-list">
-                    {% for plan in training_plans %}
-                        <div class="training-plan-item">
-                            <h3>{{ plan.name }}</h3>
-                            <div class="exercises-list">
-                                <h4>Ćwiczenia:</h4>
-                                <ul>
-                                    {% for exercise in plan.exercises.all %}
-                                        <li>{{ exercise.name }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
+    <!-- Sekcja z planami treningowymi -->
+    <div class="training-plans-section">
+        <h2>Twoje plany treningowe</h2>
+        {% if training_plans %}
+            <div class="training-plans-list">
+                {% for plan in training_plans %}
+                    <div class="training-plan-item">
+                        <h3>{{ plan.name }}</h3>
+                        <div class="plan-display exercises-list">
+                            <h4>Ćwiczenia:</h4>
+                            <ul>
+                                {% for exercise in plan.exercises.all %}
+                                    <li>{{ exercise.name }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>Nie masz jeszcze żadnych planów treningowych.</p>
-            {% endif %}
-        </div>
-        
-        <button class="button add_plan" onclick="showPopup()" type="button">Dodaj plan treningowy</button>
-    
-    <div id="popup" class="popup">
-        <div class="popup-content">
+                        <div class="plan-display plan-intensity">
+                            <h4>Intensywność:</h4>
+                            <ul>
+                                <li>{{plan.intensity}}</li>
+                            </ul>    
+                        </div>
+                        <div class="plan-display plan-training_days">
+                            <h4>Dni treningu:</h4>
+                            <ul>
+                                <li>{{ plan.get_training_days_display|join:", " }}</li>
+                            </ul>    
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Nie masz jeszcze żadnych planów treningowych.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    <div id="popup" class="popup" style="display: none;">
+    <div class="popup-content" style="max-height: 60vh; overflow-y: auto;">
           <span class="close" id="closePopupBtn">&times;</span>
           <h2>Create a New Training Plan</h2>
     
           <form id="trainingPlanForm" method="POST" action="{% url 'create_training_plan' %}">
             {% csrf_token %}
+
             <label>Plan Name:</label>
             {{ form.name }}
-            <label>Choose Excersises:</label>
-            {{ form.exercises }}
-            <button type="submit">Save Plan</button>
-          </form>
-      </div>
-    </div>
 
+            <label>Choose Exercises:</label>
+            {{ form.exercises }}
+
+            <label>Level of Intensity:</label>
+            {{ form.intensity }}
+
+            <label>Days of week:</label>
+            {{ form.training_days }}
+            <button type="submit">Save Plan</button>
+        </form>
+    </div>
+</div>
+
+{% load static %}
+<script src="{% static 'js/home.js' %}"></script>
 {% endblock %}

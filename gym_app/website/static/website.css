@@ -267,18 +267,18 @@ h1 {
   padding-bottom: 8px;
 }
 
-.exercises-list h4 {
+.plan-display h4 {
   margin: 10px 0 5px;
   font-size: 0.95rem;
   color: #555;
 }
 
-.exercises-list ul {
+.plan-display ul {
   margin: 0;
-  padding-left: 20px;
+  padding: 10px 20px;
 }
 
-.exercises-list li {
+.plan-display li {
   margin-bottom: 3px;
 }
 
@@ -294,6 +294,7 @@ h1 {
 }
 
 .button.add_plan:hover {
-  background-color: #27ae60;
+  background-color: #4CAF50;
+  /* opacity: 0.5; */
 }
   

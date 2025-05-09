@@ -1,5 +1,6 @@
 env/
 gym_app/gym_app/__pycache__/
-gym_app/website/migrations/
 gym_app/website/__pycache__/
+gym_app/website/migrations/__pycache__/
 .idea/
+db.sqlite3
