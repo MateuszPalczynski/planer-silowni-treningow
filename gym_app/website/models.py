@@ -40,4 +40,8 @@ class TrainingPlan(models.Model):
     def __str__(self):
         days = ', '.join(self.trainingDays).title() if self.trainingDays else 'No days set'
         return f'{self.name} - {self.get_intensity_display()} Intensity, Training Days: {days}'
+    
+    def get_training_days_display(self):
+        day_map = dict(self.DAYS_OF_WEEK)
+        return [day_map.get(day, day) for day in self.training_days]
 

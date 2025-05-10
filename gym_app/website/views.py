@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import TrainingPlanForm
 from django.shortcuts import render, redirect
 
+from .models import TrainingPlan
 
 # Widok rejestracji
 def register(request):
@@ -34,7 +35,18 @@ def register(request):
 
 def home(request):
     form = TrainingPlanForm(request.POST)
-    return render(request, 'home.html', {'form': form})
+    #return render(request, 'home.html', {'form': form})
+    training_plans = []
+    
+    if request.user.is_authenticated:
+        training_plans = TrainingPlan.objects.filter(user=request.user)
+    
+    context = {
+        'form': form,
+        'training_plans': training_plans
+    }
+    
+    return render(request, 'home.html', context)
 
 
 def user_login(request):
