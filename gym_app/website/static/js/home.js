@@ -20,4 +20,20 @@ document.addEventListener('DOMContentLoaded', () => {
       popup.style.display = 'none';
     }
   });
+
+  // Wyświetl przycisk „Usuń” po kliknięciu na plan
+  document.querySelectorAll('.training-plan-item').forEach(item => {
+    item.addEventListener('click', e => {
+      if (e.target.closest('.plan-actions')) return;
+      document.querySelectorAll('.plan-actions').forEach(a => a.style.display = 'none');
+      item.querySelector('.plan-actions').style.display = 'block';
+    });
+  });
+
+  // Klik poza planami – schowaj przycisk
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.training-plan-item')) {
+      document.querySelectorAll('.plan-actions').forEach(a => a.style.display = 'none');
+    }
+  });
 });
