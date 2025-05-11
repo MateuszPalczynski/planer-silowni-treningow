@@ -38,9 +38,9 @@ Jako użytkownik
 chcę móc wybrać gotowy plan treningowy stworzony przez specjalistów,
 aby szybko rozpocząć ćwiczenia bez konieczności ręcznego układania planu.
 
-Jako użytkownik
+~~Jako użytkownik
 chcę mieć możliwość dodania notatek do treningów,
-aby zapisać swoje odczucia lub wskazówki dotyczące ćwiczeń.
+aby zapisać swoje odczucia lub wskazówki dotyczące ćwiczeń.~~
 
 Jako trener personalny
 chcę mieć możliwość przeglądania planów moich podopiecznych,
