@@ -38,7 +38,7 @@ class TrainingPlan(models.Model):
     training_days = models.JSONField(default=list)
 
     def __str__(self):
-        days = ', '.join(self.trainingDays).title() if self.trainingDays else 'No days set'
+        days = ', '.join(self.training_days).title() if self.training_days else 'No days set'
         return f'{self.name} - {self.get_intensity_display()} Intensity, Training Days: {days}'
     
     def get_training_days_display(self):
