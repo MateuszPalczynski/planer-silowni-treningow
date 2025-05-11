@@ -14,6 +14,14 @@ aby mieć dostęp do swojego spersonalizowanego planera treningów.~~
 chcę móc dodać swój plan treningowy,
 aby mieć uporządkowane ćwiczenia do wykonania w konkretnych dniach tygodnia.~~
 
+~~Jako użytkownik
+chcę mieć możliwość dodania notatek do treningów,
+aby zapisać swoje odczucia lub wskazówki dotyczące ćwiczeń.~~
+
+~~Jako administrator systemu
+chcę mieć możliwość zarządzania użytkownikami,
+aby zapewnić bezpieczeństwo i poprawne działanie aplikacji.~~
+
 **Jako użytkownik
 chcę móc edytować i usuwać ćwiczenia w planie treningowym,
 aby dostosować go do moich aktualnych potrzeb i postępów.**
@@ -38,10 +46,6 @@ Jako użytkownik
 chcę móc wybrać gotowy plan treningowy stworzony przez specjalistów,
 aby szybko rozpocząć ćwiczenia bez konieczności ręcznego układania planu.
 
-~~Jako użytkownik
-chcę mieć możliwość dodania notatek do treningów,
-aby zapisać swoje odczucia lub wskazówki dotyczące ćwiczeń.~~
-
 Jako trener personalny
 chcę mieć możliwość przeglądania planów moich podopiecznych,
 aby skuteczniej monitorować ich postępy i sugerować zmiany.
@@ -50,10 +54,6 @@ Jako trener personalny
 chcę móc dodawać rekomendowane plany treningowe,
 aby moi podopieczni mieli dostęp do profesjonalnych programów ćwiczeń.
 
-~~Jako administrator systemu
-chcę mieć możliwość zarządzania użytkownikami,
-aby zapewnić bezpieczeństwo i poprawne działanie aplikacji.~~
-
 Jako administrator systemu
 chcę mieć możliwość monitorowania aktywności użytkowników,
 aby wykrywać nieprawidłowości i reagować na ewentualne problemy.
@@ -61,5 +61,3 @@ aby wykrywać nieprawidłowości i reagować na ewentualne problemy.
 Jako użytkownik
 chcę móc synchronizować dane z zewnętrznymi aplikacjami fitness,
 aby wszystkie moje dane były w jednym miejscu.
-
-
