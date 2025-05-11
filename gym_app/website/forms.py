@@ -47,4 +47,4 @@ class TrainingPlanNotesForm(forms.ModelForm):
 class TrainingPlanTrainerNotesForm(forms.ModelForm):
     class Meta:
         model = TrainingPlan
-        fields = ['trainer_notes']
+        fields = ['trainer_notes','send_notification']
