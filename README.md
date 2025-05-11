@@ -26,6 +26,10 @@ aby zapewnić bezpieczeństwo i poprawne działanie aplikacji.~~
 chcę mieć możliwość ustawienia przypomnień o treningach,
 aby nie zapominać o planowanych ćwiczeniach.~~
 
+~~Jako trener personalny
+chcę mieć możliwość przeglądania planów moich podopiecznych,
+aby skuteczniej monitorować ich postępy i sugerować zmiany.~~
+
 **Jako użytkownik
 chcę móc edytować i usuwać ćwiczenia w planie treningowym,
 aby dostosować go do moich aktualnych potrzeb i postępów.**
@@ -45,10 +49,6 @@ aby mieć podgląd na swoje statystyki i rozwój.
 Jako użytkownik
 chcę móc wybrać gotowy plan treningowy stworzony przez specjalistów,
 aby szybko rozpocząć ćwiczenia bez konieczności ręcznego układania planu.
-
-Jako trener personalny
-chcę mieć możliwość przeglądania planów moich podopiecznych,
-aby skuteczniej monitorować ich postępy i sugerować zmiany.
 
 Jako trener personalny
 chcę móc dodawać rekomendowane plany treningowe,
