@@ -22,6 +22,10 @@ aby zapisać swoje odczucia lub wskazówki dotyczące ćwiczeń.~~
 chcę mieć możliwość zarządzania użytkownikami,
 aby zapewnić bezpieczeństwo i poprawne działanie aplikacji.~~
 
+~~Jako użytkownik
+chcę mieć możliwość ustawienia przypomnień o treningach,
+aby nie zapominać o planowanych ćwiczeniach.~~
+
 **Jako użytkownik
 chcę móc edytować i usuwać ćwiczenia w planie treningowym,
 aby dostosować go do moich aktualnych potrzeb i postępów.**
@@ -37,10 +41,6 @@ aby lepiej dostosować plan do swoich możliwości.**
 Jako użytkownik
 chcę móc generować raporty z wykonanych treningów,
 aby mieć podgląd na swoje statystyki i rozwój.
-
-Jako użytkownik
-chcę mieć możliwość ustawienia przypomnień o treningach,
-aby nie zapominać o planowanych ćwiczeniach.
 
 Jako użytkownik
 chcę móc wybrać gotowy plan treningowy stworzony przez specjalistów,
