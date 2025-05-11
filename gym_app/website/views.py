@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 
-from .forms import TrainingPlanForm, TrainingPlanNotesForm
+from .forms import TrainingPlanForm, TrainingPlanNotesForm, TrainingPlanTrainerNotesForm
 from .models import TrainingPlan
 
 
@@ -39,16 +39,20 @@ def register(request):
 
 
 def home(request):
-    form = TrainingPlanForm(request.POST)
+    form = TrainingPlanForm()
     #return render(request, 'home.html', {'form': form})
     training_plans = []
-    
-    if request.user.is_authenticated:
-        training_plans = TrainingPlan.objects.filter(user=request.user)
-    
+    user = request.user
+    is_trainer = False
+
+    if user.is_authenticated:
+        is_trainer = user.groups.filter(name='trener').exists()
+        training_plans = TrainingPlan.objects.all() if is_trainer else TrainingPlan.objects.filter(user=user)
+
     context = {
         'form': form,
-        'training_plans': training_plans
+        'training_plans': training_plans,
+        'is_trainer': is_trainer
     }
     
     return render(request, 'home.html', context)
@@ -103,4 +107,23 @@ def update_training_plan(request, pk):
             return redirect('home')
     else:
         form = TrainingPlanForm(instance=plan)
+    return redirect('home')
+
+@login_required
+def update_trainer_notes(request, pk):
+    is_trainer = False
+    plan = get_object_or_404(TrainingPlan, pk=pk)
+    is_trainer = request.user.groups.filter(name='trener').exists()
+    print("Grupy użytkownika:", request.user.groups.all())
+
+    if not is_trainer:
+        return HttpResponseForbidden("Nie masz uprawnień do edycji tego planu.")
+    if request.method == "POST":
+        form = TrainingPlanTrainerNotesForm(request.POST, instance=plan)
+        if form.is_valid():
+            plan.notes = form.cleaned_data['trainer_notes']
+            plan.save(update_fields=['trainer_notes'])
+            return redirect('home')
+    else:
+        form = TrainingPlanTrainerNotesForm(instance=plan)
     return redirect('home')

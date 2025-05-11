@@ -43,3 +43,8 @@ class TrainingPlanNotesForm(forms.ModelForm):
     class Meta:
         model = TrainingPlan
         fields = ['notes']
+
+class TrainingPlanTrainerNotesForm(forms.ModelForm):
+    class Meta:
+        model = TrainingPlan
+        fields = ['trainer_notes']
