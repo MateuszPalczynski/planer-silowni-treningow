@@ -99,7 +99,8 @@ def update_training_plan(request, pk):
         form = TrainingPlanNotesForm(request.POST, instance=plan)
         if form.is_valid():
             plan.notes = form.cleaned_data['notes']
-            plan.save(update_fields=['notes'])
+            plan.send_notification = form.cleaned_data['send_notification']
+            plan.save(update_fields=['notes','send_notification'])
             return redirect('home')
     else:
         form = TrainingPlanForm(instance=plan)
