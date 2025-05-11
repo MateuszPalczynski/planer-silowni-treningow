@@ -1,11 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from .forms import TrainingPlanForm
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 
+from .forms import TrainingPlanForm
 from .models import TrainingPlan
+
+
+
 
 # Widok rejestracji
 def register(request):
@@ -75,3 +80,12 @@ def create_training_plan(request):
         form = TrainingPlanForm(user=request.user)
 
     return render(request, 'workout_plan_form.html', {'form': form})
+
+@login_required
+def delete_training_plan(request, pk):
+    plan = get_object_or_404(TrainingPlan, pk=pk)
+    if plan.user != request.user:
+        return HttpResponseForbidden("Nie masz uprawnień do usunięcia tego planu.")
+    if request.method == "POST":
+        plan.delete()
+    return redirect('home')
