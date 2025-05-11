@@ -36,6 +36,7 @@ class TrainingPlan(models.Model):
         default='medium',
     )
     training_days = models.JSONField(default=list)
+    notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
         days = ', '.join(self.training_days).title() if self.training_days else 'No days set'

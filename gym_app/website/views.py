@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 
-from .forms import TrainingPlanForm
+from .forms import TrainingPlanForm, TrainingPlanNotesForm
 from .models import TrainingPlan
 
 
@@ -88,4 +88,19 @@ def delete_training_plan(request, pk):
         return HttpResponseForbidden("Nie masz uprawnień do usunięcia tego planu.")
     if request.method == "POST":
         plan.delete()
+    return redirect('home')
+
+@login_required
+def update_training_plan(request, pk):
+    plan = get_object_or_404(TrainingPlan, pk=pk)
+    if plan.user != request.user:
+        return HttpResponseForbidden("Nie masz uprawnień do edycji tego planu.")
+    if request.method == "POST":
+        form = TrainingPlanNotesForm(request.POST, instance=plan)
+        if form.is_valid():
+            plan.notes = form.cleaned_data['notes']
+            plan.save(update_fields=['notes'])
+            return redirect('home')
+    else:
+        form = TrainingPlanForm(instance=plan)
     return redirect('home')
