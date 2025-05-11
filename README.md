@@ -50,9 +50,9 @@ Jako trener personalny
 chcę móc dodawać rekomendowane plany treningowe,
 aby moi podopieczni mieli dostęp do profesjonalnych programów ćwiczeń.
 
-**Jako administrator systemu
+~~Jako administrator systemu
 chcę mieć możliwość zarządzania użytkownikami,
-aby zapewnić bezpieczeństwo i poprawne działanie aplikacji.**
+aby zapewnić bezpieczeństwo i poprawne działanie aplikacji.~~
 
 Jako administrator systemu
 chcę mieć możliwość monitorowania aktywności użytkowników,
