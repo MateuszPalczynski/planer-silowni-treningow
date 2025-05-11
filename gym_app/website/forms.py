@@ -23,12 +23,23 @@ class TrainingPlanForm(forms.ModelForm):
         required=True
     )
 
+    notes = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3, 'style': 'width: 100%;'}),
+        required=False,  # Możesz ustawić na True, jeśli notatki są obowiązkowe
+        label='Notatki',
+    )
+
     class Meta:
         model = TrainingPlan
-        fields = ['name', 'exercises', 'intensity', 'training_days']
+        fields = ['name', 'exercises', 'intensity', 'training_days', 'notes']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Pobranie użytkownika
         super().__init__(*args, **kwargs)
         if user:
             self.instance.user = user  # Przypisanie user_id
+
+class TrainingPlanNotesForm(forms.ModelForm):
+    class Meta:
+        model = TrainingPlan
+        fields = ['notes']

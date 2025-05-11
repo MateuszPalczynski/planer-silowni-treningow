@@ -119,6 +119,11 @@ h1 {
 .btn-register:hover {
     background-color: #2980b9;
 }
+.save-btn {
+  position: absolute;
+  right: auto;
+  bottom: 20px;
+}
 
 .login-link {
     text-align: center;
@@ -248,7 +253,7 @@ h1 {
 .training-plan-item {
   background-color: white;
   border-radius: 4px;
-  padding: 15px;
+  padding: 80px 60px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   width: calc(50% - 15px);
   box-sizing: border-box;
@@ -264,7 +269,7 @@ h1 {
   margin-top: 0;
   color: #2c3e50;
   border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
+  padding: 10px 5px;
 }
 
 .plan-display h4 {
@@ -280,7 +285,7 @@ h1 {
 
 .plan-display li {
   margin-bottom: 3px;
-}
+} 
 
 .button.add_plan {
   margin: 20px 0;
