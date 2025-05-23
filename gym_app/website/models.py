@@ -37,6 +37,7 @@ class TrainingPlan(models.Model):
     )
     training_days = models.JSONField(default=list)
     notes = models.TextField(null=True, blank=True)
+    send_notification = models.BooleanField(default=False, help_text="Wysyłaj powiadomienia e-mail w dni treningowe")
 
     def __str__(self):
         days = ', '.join(self.training_days).title() if self.training_days else 'No days set'

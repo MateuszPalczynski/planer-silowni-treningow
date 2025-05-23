@@ -51,6 +51,12 @@
             </div>
             <form method="post" action="{% url 'update_training_plan' plan.id %}" class="save-form" style="display:inline;">
                 {% csrf_token %}
+                <div class="plan-display plan-send_notification">
+                    <label>
+                        <input type="checkbox" name="send_notification" {% if plan.send_notification %}checked{% endif %}>
+                        Wysyłaj powiadomienia e-mail
+                    </label>
+                </div>
                 <div class="plan-display plan-notes">
                     <h4>Notatki:</h4>
                     <textarea name="notes" rows="3" style="width: 100%;" data-plan-id="{{ plan.id }}">{{ plan.notes|default_if_none:"" }}</textarea>
