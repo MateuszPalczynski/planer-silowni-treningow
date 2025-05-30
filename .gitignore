@@ -1,3 +1,7 @@
+# Ignoruj wszystkie katalogi __pycache__
+__pycache__/
+# Lub, dla pewności we wszystkich podkatalogach (nowsze wersje Gita dobrze sobie radzą z powyższym):
+**/__pycache
 env/
 gym_app/gym_app/__pycache__/
 gym_app/website/__pycache__/
