@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
-from .views import user_login, register, home, create_training_plan, delete_training_plan, update_training_plan
+from .views import user_login, register, home, create_training_plan, delete_training_plan, update_training_plan,update_trainer_notes
 
 urlpatterns = [
     path('', home, name='home'),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('create_training_plan/', create_training_plan, name='create_training_plan'),
     path('delete-plan/<int:pk>/', delete_training_plan, name='delete_training_plan'),
     path('training/update/<int:pk>/', update_training_plan, name='update_training_plan'),
+    path('training/update_trainer_notes/<int:pk>/', update_trainer_notes, name='update_trainer_notes'),
 ]
