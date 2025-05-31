@@ -16,7 +16,7 @@ class TrainingPlan(models.Model):
         ('medium', 'Medium'),
         ('high', 'High'),
     ]
-    
+
     DAYS_OF_WEEK = [
         ('mon', 'Monday'),
         ('tue', 'Tuesday'),
@@ -29,7 +29,13 @@ class TrainingPlan(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Powiązanie z użytkownikiem
     name = models.CharField(max_length=255)  # Nazwa planu treningowego
-    exercises = models.ManyToManyField(Exercise)
+
+    exercises = models.ManyToManyField(
+        Exercise,
+        through='TrainingPlanExercise',
+        related_name='plans'
+    )
+
     intensity = models.CharField(
         max_length=6,
         choices=INTENSITY_CHOICES,
@@ -43,8 +49,19 @@ class TrainingPlan(models.Model):
     def __str__(self):
         days = ', '.join(self.training_days).title() if self.training_days else 'No days set'
         return f'{self.name} - {self.get_intensity_display()} Intensity, Training Days: {days}'
-    
+
     def get_training_days_display(self):
         day_map = dict(self.DAYS_OF_WEEK)
         return [day_map.get(day, day) for day in self.training_days]
 
+
+class TrainingPlanExercise(models.Model):
+    training_plan = models.ForeignKey(TrainingPlan, on_delete=models.CASCADE)
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    repetitions = models.PositiveIntegerField(default=10)
+
+    class Meta:
+        unique_together = ('training_plan', 'exercise')
+
+    def __str__(self):
+        return f"{self.training_plan.name} – {self.exercise.name}: {self.repetitions} reps"

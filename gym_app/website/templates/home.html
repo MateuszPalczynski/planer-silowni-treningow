@@ -21,28 +21,31 @@
 {% if user.is_authenticated %}
 <div class="training-plans-section">
     {% if is_trainer %}
-    <h2>Plany treningowe podopiecznych</h2>
+        <h2>Plany treningowe podopiecznych</h2>
     {% else %}
-    <h2>Twoje plany treningowe</h2>
+        <h2>Twoje plany treningowe</h2>
     {% endif %}
+
     {% if training_plans %}
     <div class="training-plans-list">
         {% for plan in training_plans %}
         <div class="training-plan-item" data-id="{{ plan.id }}" style="position: relative; cursor: pointer;">
-                <h3>{{ plan.name }} </h3>
-                    {% if is_trainer %}
-                        <div class="plan-display user">
-                            <h4>Użytkownik: </h4>
-                            <ul>
-                                <li>{{ plan.user }}</li>
-                            </ul>
-                        </div>
-                    {% endif %}
+            <h3>{{ plan.name }}</h3>
+
+            {% if is_trainer %}
+            <div class="plan-display user">
+                <h4>Użytkownik:</h4>
+                <ul>
+                    <li>{{ plan.user }}</li>
+                </ul>
+            </div>
+            {% endif %}
+
             <div class="plan-display exercises-list">
                 <h4>Ćwiczenia:</h4>
                 <ul>
-                    {% for exercise in plan.exercises.all %}
-                        <li>{{ exercise.name }}</li>
+                    {% for tpe in plan.trainingplanexercise_set.all %}
+                        <li>{{ tpe.exercise.name }} &mdash; {{ tpe.repetitions }} powtórzeń</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -60,51 +63,52 @@
                     <li>{{ plan.get_training_days_display|join:", " }}</li>
                 </ul>
             </div>
-            {%if not is_trainer %}
-                <div class="plan-display trainer_notes">
+
+            {% if not is_trainer %}
+            <div class="plan-display trainer_notes">
                 <h4>Notatki Trenera:</h4>
                 <ul>
                     <li>{{ plan.trainer_notes|default_if_none:"" }}</li>
                 </ul>
-                </div>
-                <form method="post" action="{% url 'update_training_plan' plan.id %}" class="save-form" style="display:inline;">
-                    {% csrf_token %}
-                    <div class="plan-display plan-send_notification">
+            </div>
+            <form method="post" action="{% url 'update_training_plan' plan.id %}" class="save-form" style="display:inline;">
+                {% csrf_token %}
+                <div class="plan-display plan-send_notification">
                     <label>
                         <input type="checkbox" name="send_notification" {% if plan.send_notification %}checked{% endif %}>
                         Wysyłaj powiadomienia e-mail
                     </label>
                 </div>
                 <div class="plan-display plan-notes">
-                        <h4>Notatki:</h4>
-                        <textarea name="notes" rows="3" style="width: 100%;" data-plan-id="{{ plan.id }}">{{ plan.notes|default_if_none:"" }}</textarea>
-                    </div>
-                    <button type="submit" class="button save-btn">Zapisz</button>
-                </form>
-                <div class="plan-actions" style="position: absolute; top: 8px; right: 8px; display: none;">
-                    <form method="post" action="{% url 'delete_training_plan' plan.id %}" class="delete-form" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="button delete-btn">Usuń</button>
-                    </form>
+                    <h4>Notatki:</h4>
+                    <textarea name="notes" rows="3" style="width: 100%;" data-plan-id="{{ plan.id }}">{{ plan.notes|default_if_none:"" }}</textarea>
                 </div>
+                <button type="submit" class="button save-btn">Zapisz</button>
+            </form>
+            <div class="plan-actions" style="position: absolute; top: 8px; right: 8px; display: none;">
+                <form method="post" action="{% url 'delete_training_plan' plan.id %}" class="delete-form" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="button delete-btn">Usuń</button>
+                </form>
+            </div>
             {% else %}
-                <div class="plan-display notes">
-                    <h4>Notatki Uzytkownika:</h4>
+            <div class="plan-display notes">
+                <h4>Notatki Użytkownika:</h4>
+                <ul>
+                    <li>{{ plan.notes|default_if_none:"" }}</li>
+                </ul>
+            </div>
+            <form method="post" action="{% url 'update_trainer_notes' plan.id %}" class="save-form" style="display:inline;">
+                {% csrf_token %}
+                <div class="plan-display plan-notes">
+                    <h4>Notatki dla podopiecznego:</h4>
                     <ul>
-                        <li>{{ plan.notes|default_if_none:"" }}</li>
+                        <textarea name="trainer_notes" rows="3" style="width: 100%;" data-plan-id="{{ plan.id }}">{{ plan.trainer_notes|default_if_none:"" }}</textarea>
                     </ul>
                 </div>
-                <form method="post" action="{% url 'update_trainer_notes' plan.id %}" class="save-form" style="display:inline;">
-                    {% csrf_token %}
-                    <div class="plan-display plan-notes">
-                        <h4>Notatki dla podopiecznego:</h4>
-                        <ul>
-                            <textarea name="trainer_notes" rows="3" style="width: 100%;" data-plan-id="{{ plan.id }}">{{ plan.trainer_notes|default_if_none:"" }}</textarea>
-                        </ul>
-                    </div>
-                    <button type="submit" class="button save-btn">Zapisz</button>
-                </form>
-            {%endif%}
+                <button type="submit" class="button save-btn">Zapisz</button>
+            </form>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -120,18 +124,41 @@
         <h2>Create a New Training Plan</h2>
         <form id="trainingPlanForm" method="POST" action="{% url 'create_training_plan' %}">
             {% csrf_token %}
-            <label>Plan Name:</label>
-            {{ form.name }}
+
+            <label>Plan Name:</label><br>
+            {{ form.name }}<br><br>
+
             <label>Choose Exercises:</label>
-            {{ form.exercises }}
-            <label>Level of Intensity:</label>
-            {{ form.intensity }}
-            <label>Days of week:</label>
-            {{ form.training_days }}
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for ex in all_exercises %}
+                <li style="margin-bottom: 8px;">
+                    <label style="font-weight: bold;">
+                        <input type="checkbox" name="exercises" value="{{ ex.id }}"> {{ ex.name }}
+                    </label>
+                    <input type="number"
+                           name="reps_{{ ex.id }}"
+                           min="1"
+                           placeholder="Powtórzeń"
+                           style="width: 80px; margin-left: 12px;"
+                           value="10">
+                </li>
+                {% empty %}
+                <li>Brak dostępnych ćwiczeń.</li>
+                {% endfor %}
+            </ul>
+            <br>
+
+            <label>Level of Intensity:</label><br>
+            {{ form.intensity }}<br><br>
+
+            <label>Days of week:</label><br>
+            {{ form.training_days }}<br><br>
+
             <button type="submit">Save Plan</button>
         </form>
     </div>
 </div>
+
 
 <script src="{% static 'js/home.js' %}"></script>
 {% endblock %}
