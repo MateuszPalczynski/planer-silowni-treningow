@@ -1,13 +1,13 @@
 # forms.py
 from django import forms
-from .models import TrainingPlan, Exercise
+from .models import TrainingPlan, Exercise, TrainingPlanExercise
 
 class TrainingPlanForm(forms.ModelForm):
-    exercises = forms.ModelMultipleChoiceField(
-        queryset=Exercise.objects.all(),
-        widget=forms.CheckboxSelectMultiple,  # Możesz użyć też SelectMultiple
-        required=True
-    )
+    # exercises = forms.ModelMultipleChoiceField(
+    #     queryset=Exercise.objects.all(),
+    #     widget=forms.CheckboxSelectMultiple,  # Możesz użyć też SelectMultiple
+    #     required=True
+    # )
 
     intensity = forms.ChoiceField(
         choices=TrainingPlan.INTENSITY_CHOICES,
@@ -31,7 +31,8 @@ class TrainingPlanForm(forms.ModelForm):
 
     class Meta:
         model = TrainingPlan
-        fields = ['name', 'exercises', 'intensity', 'training_days', 'notes']
+        # fields = ['name', 'exercises', 'intensity', 'training_days', 'notes']
+        fields = ['name', 'intensity', 'training_days', 'notes']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Pobranie użytkownika

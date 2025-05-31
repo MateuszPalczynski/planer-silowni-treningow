@@ -41,8 +41,8 @@
             <div class="plan-display exercises-list">
                 <h4>Ćwiczenia:</h4>
                 <ul>
-                    {% for exercise in plan.exercises.all %}
-                        <li>{{ exercise.name }}</li>
+                    {% for item in plan.trainingplanexercise_set.all %}
+                        <li>{{ item.exercise.name }} x {{ item.repeats }} </li>
                     {% endfor %}
                 </ul>
             </div>
@@ -123,7 +123,15 @@
             <label>Plan Name:</label>
             {{ form.name }}
             <label>Choose Exercises:</label>
-            {{ form.exercises }}
+            <div id="exercise-list">
+                {% for exercise in exercises %}
+                <div>
+                    <input type="checkbox" name="exercise_{{ exercise.id }}" id="exercise_{{ exercise.id }}">
+                    <label for="exercise_{{ exercise.id }}">{{ exercise.name }}</label>
+                    <input type="number" name="repeats_{{ exercise.id }}" min="1" value="10" style="width: 70px;">
+                </div>
+                {% endfor %}
+            </div>
             <label>Level of Intensity:</label>
             {{ form.intensity }}
             <label>Days of week:</label>

@@ -7,7 +7,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 
 from .forms import TrainingPlanForm, TrainingPlanNotesForm, TrainingPlanTrainerNotesForm
-from .models import TrainingPlan
+from .models import TrainingPlan, Exercise, TrainingPlanExercise
 
 
 
@@ -41,6 +41,7 @@ def register(request):
 def home(request):
     form = TrainingPlanForm()
     #return render(request, 'home.html', {'form': form})
+    exercises = Exercise.objects.all()
     training_plans = []
     user = request.user
     is_trainer = False
@@ -51,6 +52,7 @@ def home(request):
 
     context = {
         'form': form,
+        'exercises': exercises,
         'training_plans': training_plans,
         'is_trainer': is_trainer
     }
@@ -75,15 +77,31 @@ def create_training_plan(request):
     if request.method == 'POST':
         form = TrainingPlanForm(request.POST, user=request.user)
         if form.is_valid():
-            trainig_plan = form.save(commit=False)
-            trainig_plan.user = request.user  # Przypisanie user_id
-            trainig_plan.save()
+            training_plan = form.save(commit=False)
+            training_plan.user = request.user  # Przypisanie user_id
+            training_plan.save()
             form.save_m2m()
+            for key, value in request.POST.items():
+                if key.startswith("exercise_") and value == "on":
+                    try:
+                        ex_id = int(key.split("_")[1])
+                        repeats = int(request.POST.get(f"repeats_{ex_id}", 10))  # Default 10 if not provided
+                        exercise = Exercise.objects.get(id=ex_id)
+
+                        # Prevent duplicates
+                        if not TrainingPlanExercise.objects.filter(training_plan=training_plan, exercise=exercise).exists():
+                            TrainingPlanExercise.objects.create(
+                                training_plan=training_plan,
+                                exercise=exercise,
+                                repeats=repeats
+                            )
+                    except (ValueError, Exercise.DoesNotExist):
+                        continue
             return redirect('home')  # Zmień na swoją stronę
     else:
         form = TrainingPlanForm(user=request.user)
-
-    return render(request, 'workout_plan_form.html', {'form': form})
+    exercises = Exercise.objects.all()
+    return render(request, 'workout_plan_form.html', {'form': form, 'exercises': exercises})
 
 @login_required
 def delete_training_plan(request, pk):

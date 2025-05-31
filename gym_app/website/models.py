@@ -29,7 +29,7 @@ class TrainingPlan(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Powiązanie z użytkownikiem
     name = models.CharField(max_length=255)  # Nazwa planu treningowego
-    exercises = models.ManyToManyField(Exercise)
+    exercises = models.ManyToManyField(Exercise, through='TrainingPlanExercise')
     intensity = models.CharField(
         max_length=6,
         choices=INTENSITY_CHOICES,
@@ -48,3 +48,13 @@ class TrainingPlan(models.Model):
         day_map = dict(self.DAYS_OF_WEEK)
         return [day_map.get(day, day) for day in self.training_days]
 
+class TrainingPlanExercise(models.Model):
+    training_plan = models.ForeignKey('TrainingPlan', on_delete=models.CASCADE)
+    exercise = models.ForeignKey('Exercise', on_delete=models.CASCADE)
+    repeats = models.PositiveIntegerField(default=10)
+
+    class Meta:
+        unique_together = ('training_plan', 'exercise')
+
+    def __str__(self):
+        return f'{self.exercise.name} x {self.repeats}'
