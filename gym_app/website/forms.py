@@ -23,6 +23,12 @@ class TrainingPlanForm(forms.ModelForm):
         required=True
     )
 
+    is_expert = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.HiddenInput()
+    )
+
     notes = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 3, 'style': 'width: 100%;'}),
         required=False,  # Możesz ustawić na True, jeśli notatki są obowiązkowe
@@ -31,7 +37,7 @@ class TrainingPlanForm(forms.ModelForm):
 
     class Meta:
         model = TrainingPlan
-        fields = ['name', 'exercises', 'intensity', 'training_days', 'notes']
+        fields = ['name', 'exercises', 'intensity', 'training_days', 'notes', 'is_expert']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Pobranie użytkownika

@@ -42,16 +42,19 @@ def home(request):
     form = TrainingPlanForm()
     #return render(request, 'home.html', {'form': form})
     training_plans = []
+    expert_plans = []
     user = request.user
     is_trainer = False
 
     if user.is_authenticated:
         is_trainer = user.groups.filter(name='trener').exists()
         training_plans = TrainingPlan.objects.all() if is_trainer else TrainingPlan.objects.filter(user=user)
+        expert_plans = TrainingPlan.objects.filter(is_expert=True)
 
     context = {
         'form': form,
         'training_plans': training_plans,
+        'expert_plans': expert_plans,
         'is_trainer': is_trainer
     }
     
@@ -73,8 +76,26 @@ def user_login(request):
 
 def create_training_plan(request):
     if request.method == 'POST':
+        print("Otrzymane dane POST:", request.POST) 
         form = TrainingPlanForm(request.POST, user=request.user)
+        expert_plan_id = request.POST.get('plan_id')
+        if expert_plan_id:
+            print()
+            original_plan = get_object_or_404(TrainingPlan, id=expert_plan_id, is_expert=True)
+
+            # Stwórz nową instancję dla zalogowanego użytkownika, kopiując dane
+            new_plan_for_user = TrainingPlan.objects.create(
+                user=request.user,
+                name=original_plan.name,
+                intensity=original_plan.intensity,
+                training_days=original_plan.training_days,
+                is_expert=False  # Nowy plan nie jest już szablonem eksperckim
+            )
+            new_plan_for_user.exercises.set(original_plan.exercises.all())
+            return redirect('home') 
+            
         if form.is_valid():
+            print("form valid")
             trainig_plan = form.save(commit=False)
             trainig_plan.user = request.user  # Przypisanie user_id
             trainig_plan.save()
