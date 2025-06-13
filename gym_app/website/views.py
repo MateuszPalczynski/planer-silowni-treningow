@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+import json
 
 from .forms import TrainingPlanForm, TrainingPlanNotesForm, TrainingPlanTrainerNotesForm
 from .models import TrainingPlan, TrainingPlanExercise, Exercise
@@ -34,12 +35,32 @@ def home(request):
     # Pobieramy WSZYSTKIE ćwiczenia, by wyświetlić je w popupie
     all_exercises = Exercise.objects.all().order_by('name')
 
+    # Przygotowanie danych JSON dla JavaScript
+    training_plans_json = []
+    if user.is_authenticated:
+        for plan in training_plans:
+            plan_data = {
+                'id': plan.id,
+                'name': plan.name,
+                'intensity': plan.intensity,
+                'training_days': plan.training_days,
+                'exercises': []
+            }
+            for tpe in plan.trainingplanexercise_set.all():
+                plan_data['exercises'].append({
+                    'id': tpe.exercise.id,
+                    'name': tpe.exercise.name,
+                    'repetitions': tpe.repetitions
+                })
+            training_plans_json.append(plan_data)
+
     return render(request, 'home.html', {
         'form': form,
         'training_plans': training_plans,
         'expert_plans': expert_plans,
         'is_trainer': is_trainer,
         'all_exercises': all_exercises,
+        'training_plans_json': json.dumps(training_plans_json),
     })
 
 
@@ -154,31 +175,39 @@ def edit_training_plan(request, pk):
         return HttpResponseForbidden("Nie masz uprawnień do edycji tego planu.")
 
     if request.method == 'POST':
-        form = TrainingPlanForm(request.POST, instance=plan)
-        if form.is_valid():
-            form.save()
-            TrainingPlanExercise.objects.filter(training_plan=plan).delete()
+        # Aktualizuj podstawowe dane planu
+        plan.name = request.POST.get('name', plan.name)
+        plan.intensity = request.POST.get('intensity', plan.intensity)
+        
+        # Aktualizuj dni treningowe
+        training_days = request.POST.getlist('training_days')
+        plan.training_days = training_days
+        
+        plan.save()
 
-            for ex_id in request.POST.getlist('exercises'):
-                try:
-                    ex = Exercise.objects.get(pk=ex_id)
-                except Exercise.DoesNotExist:
-                    continue
+        # Usuń stare ćwiczenia i dodaj nowe
+        TrainingPlanExercise.objects.filter(training_plan=plan).delete()
 
-                reps_str = request.POST.get(f'reps_{ex_id}', '10').strip()
-                try:
-                    reps = int(reps_str) if reps_str else 10
-                    if reps < 1:
-                        reps = 1
-                except ValueError:
-                    reps = 10
+        for ex_id in request.POST.getlist('exercises'):
+            try:
+                ex = Exercise.objects.get(pk=ex_id)
+            except Exercise.DoesNotExist:
+                continue
 
-                TrainingPlanExercise.objects.create(
-                    training_plan=plan,
-                    exercise=ex,
-                    repetitions=reps
-                )
-            return redirect('home')
+            reps_str = request.POST.get(f'reps_{ex_id}', '10').strip()
+            try:
+                reps = int(reps_str) if reps_str else 10
+                if reps < 1:
+                    reps = 1
+            except ValueError:
+                reps = 10
+
+            TrainingPlanExercise.objects.create(
+                training_plan=plan,
+                exercise=ex,
+                repetitions=reps
+            )
+        return redirect('home')
 
     # Ta ścieżka (GET lub błąd formularza) nie jest używana przy podejściu z popupem,
     # ale można ją zaimplementować do osobnej strony edycji.
