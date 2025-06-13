@@ -66,3 +66,23 @@ class TrainingPlanExercise(models.Model):
 
     def __str__(self):
         return f"{self.training_plan.name} – {self.exercise.name}: {self.repetitions} reps"
+
+class ActivityLog(models.Model):
+    """Model do zapisywania logów aktywności użytkowników."""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Użytkownik"
+    )
+    action = models.TextField(verbose_name="Aktywność")
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Znacznik czasu")
+
+    class Meta:
+        verbose_name = "Log Aktywności"
+        verbose_name_plural = "Logi Aktywności"
+        ordering = ['-timestamp'] # Najnowsze na górze
+
+    def __str__(self):
+        return f'{self.timestamp.strftime("%Y-%m-%d %H:%M:%S")} - {self.user.username if self.user else "System"} - {self.action}'
