@@ -2,6 +2,7 @@
 from django import forms
 from .models import TrainingPlan, Exercise
 
+
 class TrainingPlanForm(forms.ModelForm):
     exercises = forms.ModelMultipleChoiceField(
         queryset=Exercise.objects.all(),
@@ -15,7 +16,7 @@ class TrainingPlanForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-select'}),
         label='Level of Intensity'
     )
-    
+
     training_days = forms.MultipleChoiceField(
         choices=TrainingPlan.DAYS_OF_WEEK,
         widget=forms.SelectMultiple,
@@ -45,12 +46,14 @@ class TrainingPlanForm(forms.ModelForm):
         if user:
             self.instance.user = user  # Przypisanie user_id
 
+
 class TrainingPlanNotesForm(forms.ModelForm):
     class Meta:
         model = TrainingPlan
-        fields = ['notes','send_notification']
+        fields = ['notes', 'send_notification']
+
 
 class TrainingPlanTrainerNotesForm(forms.ModelForm):
     class Meta:
         model = TrainingPlan
-        fields = ['trainer_notes','send_notification']
+        fields = ['trainer_notes', 'send_notification']
