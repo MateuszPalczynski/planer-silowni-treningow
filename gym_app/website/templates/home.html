@@ -12,6 +12,11 @@
             <button type="submit" class="button logout">Wyloguj się</button>
         </form>
         <button class="button add_plan" id="openPopupBtn" type="button">Add Training Plan</button>
+        {%if is_trainer %}
+        <button class="button expert_plan" id="openExpertPopupBtn" type="button">Add Expert Plan</button>
+        {% else %}
+        <button class="button expert_plan" id="openChooseExpertPopupBtn" type="button">Choose Expert Plan</button>
+        {% endif %}
     {% else %}
         <a href="{% url 'login' %}" class="button login">Zaloguj się</a>
         <a href="{% url 'register' %}" class="button register">Zarejestruj się</a>
@@ -121,10 +126,10 @@
 <div id="popup" class="popup" style="display: none;">
     <div class="popup-content" style="max-height: 60vh; overflow-y: auto;">
         <span class="close" id="closePopupBtn">&times;</span>
-        <h2>Create a New Training Plan</h2>
+        <h2 id = "popupTitle">Create a New Training Plan</h2>
         <form id="trainingPlanForm" method="POST" action="{% url 'create_training_plan' %}">
             {% csrf_token %}
-
+            {{ form.is_expert }}
             <label>Plan Name:</label><br>
             {{ form.name }}<br><br>
 
@@ -159,6 +164,44 @@
     </div>
 </div>
 
+<div id="popupExpertPlans" class="popup" style="display: none;">
+    <div class="popup-content" style="max-height: 60vh; overflow-y: auto;">
+        <span class="close" id="closeChooseExpertPopupBtn">&times;</span>
+        <h2 id = "popupTitle">Choose Expert Plan</h2>
+        {% for expert_plan in expert_plans %}
+        <div class="expert-plan">
+        <form id="trainingPlanForm" method="POST" action="{% url 'create_training_plan' %}">
+        {% csrf_token %}
+        <p>{{ expert_plan.name }}</p>
+        <div class="plan-display exercises-list">
+            <h4>Ćwiczenia:</h4>
+            <ul>
+                {% for exercise in expert_plan.exercises.all %}
+                    <li>{{ exercise.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="plan-display plan-intensity">
+            <h4>Intensywność:</h4>
+            <ul>
+                <li>{{ expert_plan.intensity }}</li>
+            </ul>
+        </div>
+
+        <div class="plan-display plan-training_days">
+            <h4>Dni treningu:</h4>
+            <ul>
+                <li>{{ expert_plan.get_training_days_display|join:", " }}</li>
+            </ul>
+        </div>
+
+            <input type="hidden" name="plan_id" value="{{ expert_plan.id }}">
+            <button type="submit">Choose Plan</button>
+        </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
 <script src="{% static 'js/home.js' %}"></script>
 {% endblock %}
