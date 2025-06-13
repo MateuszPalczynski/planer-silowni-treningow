@@ -6,9 +6,11 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from django.utils.dateparse import parse_date
+from .models import TrainingPlanCompletion
 
 from .forms import TrainingPlanForm, TrainingPlanNotesForm, TrainingPlanTrainerNotesForm
-from .models import TrainingPlan, TrainingPlanExercise, Exercise
+from .models import TrainingPlan, TrainingPlanExercise, Exercise, TrainingPlanCompletion
 
 
 def home(request):
@@ -219,4 +221,33 @@ def update_trainer_notes(request, pk):
         if form.is_valid():
             plan.trainer_notes = form.cleaned_data['trainer_notes']
             plan.save(update_fields=['trainer_notes'])
+    return redirect('home')
+
+@login_required
+def mark_training_plan_done(request, plan_id):
+    plan = get_object_or_404(TrainingPlan, id=plan_id)
+
+    if plan.user != request.user:
+        return HttpResponseForbidden("Nie masz uprawnień do oznaczenia tego planu jako wykonanego.")
+
+    if request.method == 'POST':
+        done_date_str = request.POST.get('done_date')
+        done_date = parse_date(done_date_str)
+
+        if not done_date:
+            messages.error(request, "Nieprawidłowa data.")
+            return redirect('home')
+
+        # Create or update the completed record
+        completed_record = TrainingPlanCompletion.objects.update_or_create(
+            training_plan=plan,
+            user=request.user,
+            defaults={'date_completed': done_date}
+        )
+        
+        print(f"Completed record {completed_record}")
+
+        messages.success(request, f"Plan treningowy oznaczony jako wykonany dnia {done_date}.")
+        return redirect('home')
+
     return redirect('home')
