@@ -1,0 +1,180 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2>Historia treningów</h2>
+            
+            <!-- Statystyki -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Łączna liczba treningów</h5>
+                            <h3 class="text-primary">{{ total_completions }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Najchętniej wykonywane plany</h5>
+                            {% for plan in popular_plans %}
+                                <div class="d-flex justify-content-between">
+                                    <span>{{ plan.training_plan__name }}</span>
+                                    <span class="badge bg-primary">{{ plan.count }}x</span>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">Brak danych</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtry -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Filtry</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="plan" class="form-label">Nazwa planu</label>
+                            <input type="text" class="form-control" id="plan" name="plan" 
+                                   value="{{ filters.plan }}" placeholder="Wyszukaj plan...">
+                        </div>
+                        {% if is_trainer %}
+                        <div class="col-md-3">
+                            <label for="user" class="form-label">Użytkownik</label>
+                            <input type="text" class="form-control" id="user" name="user" 
+                                   value="{{ filters.user }}" placeholder="Nazwa użytkownika...">
+                        </div>
+                        {% endif %}
+                        <div class="col-md-3">
+                            <label for="date_from" class="form-label">Data od</label>
+                            <input type="date" class="form-control" id="date_from" name="date_from" 
+                                   value="{{ filters.date_from }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="date_to" class="form-label">Data do</label>
+                            <input type="date" class="form-control" id="date_to" name="date_to" 
+                                   value="{{ filters.date_to }}">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Filtruj</button>
+                            <a href="{% url 'training_history' %}" class="btn btn-secondary">Wyczyść</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Lista wykonanych treningów -->
+            {% if completions %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Wykonane treningi</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Plan treningowy</th>
+                                        {% if is_trainer %}
+                                        <th>Użytkownik</th>
+                                        {% endif %}
+                                        <th>Intensywność</th>
+                                        <th>Liczba ćwiczeń</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for completion in completions %}
+                                    <tr>
+                                        <td>{{ completion.date_completed|date:"d.m.Y" }}</td>
+                                        <td>
+                                            <strong>{{ completion.training_plan.name }}</strong>
+                                            {% if completion.training_plan.training_days %}
+                                                <br><small class="text-muted">
+                                                    Dni: {{ completion.training_plan.training_days|join:", "|title }}
+                                                </small>
+                                            {% endif %}
+                                        </td>
+                                        {% if is_trainer %}
+                                        <td>{{ completion.user.username }}</td>
+                                        {% endif %}
+                                        <td>
+                                            <span class="badge 
+                                                {% if completion.training_plan.intensity == 'low' %}bg-success
+                                                {% elif completion.training_plan.intensity == 'medium' %}bg-warning
+                                                {% else %}bg-danger{% endif %}">
+                                                {{ completion.training_plan.get_intensity_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ completion.training_plan.trainingplanexercise_set.count }}</td>
+                                        <td>
+                                            <a href="{% url 'training_history_detail' completion.id %}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                Szczegóły
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Paginacja -->
+                        {% if page_obj.has_other_pages %}
+                            <nav aria-label="Paginacja historii">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                                &laquo; Pierwsza
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                                Poprzednia
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    <li class="page-item active">
+                                        <span class="page-link">
+                                            Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}
+                                        </span>
+                                    </li>
+                                    
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                                Następna
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                                Ostatnia &raquo;
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <h5>Brak wykonanych treningów</h5>
+                    <p>Nie ma jeszcze żadnych zapisanych treningów w historii. 
+                       <a href="{% url 'home' %}">Wróć do strony głównej</a> i oznacz pierwszy trening jako wykonany!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

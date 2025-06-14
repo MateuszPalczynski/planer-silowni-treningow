@@ -17,6 +17,7 @@
         {% else %}
         <button class="button expert_plan" id="openChooseExpertPopupBtn" type="button">Choose Expert Plan</button>
         {% endif %}
+        <a href="{% url 'training_history' %}" class="button history">Historia treningów</a>
     {% else %}
         <a href="{% url 'login' %}" class="button login">Zaloguj się</a>
         <a href="{% url 'register' %}" class="button register">Zarejestruj się</a>

@@ -280,3 +280,107 @@ def mark_training_plan_done(request, plan_id):
         return redirect('home')
 
     return redirect('home')
+
+@login_required
+def training_history(request):
+    """
+    Widok do przeglądania historii wykonanych treningów użytkownika.
+    """
+    user = request.user
+    is_trainer = user.groups.filter(name='trener').exists()
+    
+    # Jeśli to trener, może przeglądać historię wszystkich użytkowników
+    if is_trainer:
+        completions = TrainingPlanCompletion.objects.select_related(
+            'training_plan', 'user'
+        ).order_by('-date_completed')
+        
+        # Filtrowanie po użytkowniku jeśli podano
+        user_filter = request.GET.get('user')
+        if user_filter:
+            completions = completions.filter(user__username__icontains=user_filter)
+    else:
+        # Zwykły użytkownik widzi tylko swoją historię
+        completions = TrainingPlanCompletion.objects.filter(
+            user=user
+        ).select_related('training_plan').order_by('-date_completed')
+    
+    # Filtrowanie po nazwie planu
+    plan_filter = request.GET.get('plan')
+    if plan_filter:
+        completions = completions.filter(training_plan__name__icontains=plan_filter)
+    
+    # Filtrowanie po dacie
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    if date_from:
+        try:
+            date_from_parsed = parse_date(date_from)
+            if date_from_parsed:
+                completions = completions.filter(date_completed__gte=date_from_parsed)
+        except:
+            pass
+    
+    if date_to:
+        try:
+            date_to_parsed = parse_date(date_to)
+            if date_to_parsed:
+                completions = completions.filter(date_completed__lte=date_to_parsed)
+        except:
+            pass
+    
+    # Paginacja - 20 rekordów na stronę
+    from django.core.paginator import Paginator
+    paginator = Paginator(completions, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Statystyki
+    total_completions = completions.count()
+    
+    # Najczęściej wykonywane plany
+    from django.db.models import Count
+    popular_plans = completions.values('training_plan__name').annotate(
+        count=Count('training_plan')
+    ).order_by('-count')[:5]
+    
+    context = {
+        'page_obj': page_obj,
+        'completions': page_obj,
+        'is_trainer': is_trainer,
+        'total_completions': total_completions,
+        'popular_plans': popular_plans,
+        'filters': {
+            'user': request.GET.get('user', ''),
+            'plan': request.GET.get('plan', ''),
+            'date_from': request.GET.get('date_from', ''),
+            'date_to': request.GET.get('date_to', ''),
+        }
+    }
+    
+    return render(request, 'training_history.html', context)
+
+@login_required  
+def training_history_detail(request, completion_id):
+    """
+    Widok do przeglądania szczegółów konkretnego wykonanego treningu.
+    """
+    completion = get_object_or_404(
+        TrainingPlanCompletion.objects.select_related('training_plan', 'user'),
+        id=completion_id
+    )
+    
+    # Sprawdź uprawnienia
+    if completion.user != request.user and not request.user.groups.filter(name='trener').exists():
+        return HttpResponseForbidden("Nie masz uprawnień do przeglądania tego treningu.")
+    
+    # Pobierz szczegóły planu treningowego
+    plan_exercises = completion.training_plan.trainingplanexercise_set.select_related('exercise').all()
+    
+    context = {
+        'completion': completion,
+        'plan_exercises': plan_exercises,
+    }
+    
+    return render(request, 'training_history_detail.html', context)
