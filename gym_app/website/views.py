@@ -302,16 +302,23 @@ def mark_training_plan_done(request, plan_id):
             messages.error(request, "Nieprawidłowa data.")
             return redirect('home')
 
-        # Create or update the completed record
-        completed_record = TrainingPlanCompletion.objects.update_or_create(
-            training_plan=plan,
-            user=request.user,
-            defaults={'date_completed': done_date}
-        )
+        # Sprawdź czy rekord już istnieje
+        try:
+            existing_completion = TrainingPlanCompletion.objects.get(
+                training_plan=plan,
+                user=request.user,
+                date_completed=done_date
+            )
+            messages.info(request, f"Plan treningowy był już oznaczony jako wykonany dnia {done_date}.")
+        except TrainingPlanCompletion.DoesNotExist:
+            # Utwórz nowy rekord
+            TrainingPlanCompletion.objects.create(
+                training_plan=plan,
+                user=request.user,
+                date_completed=done_date
+            )
+            messages.success(request, f"Plan treningowy oznaczony jako wykonany dnia {done_date}.")
         
-        print(f"Completed record {completed_record}")
-
-        messages.success(request, f"Plan treningowy oznaczony jako wykonany dnia {done_date}.")
         return redirect('home')
 
     return redirect('home')
