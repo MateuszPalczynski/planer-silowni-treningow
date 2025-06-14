@@ -126,9 +126,16 @@ def create_training_plan(request):
                     exercise=tpe.exercise,
                     repetitions=tpe.repetitions
                 )
+            messages.success(request, f"Plan treningowy '{new_plan.name}' został pomyślnie skopiowany!")
             return redirect('home')
 
         # Przypadek 2: Użytkownik tworzy plan od podstaw
+        # Najpierw sprawdź czy wybrano ćwiczenia (przed walidacją formularza)
+        selected_exercises = request.POST.getlist('exercises')
+        if not selected_exercises:
+            messages.error(request, "Nie można utworzyć pustego planu treningowego. Wybierz przynajmniej jedno ćwiczenie.")
+            return redirect('home')
+        
         form = TrainingPlanForm(request.POST)
         if form.is_valid():
             plan = form.save(commit=False)
@@ -139,7 +146,8 @@ def create_training_plan(request):
             plan.save()
 
             # Dla każdego zaznaczonego ex_id pobieramy wartość reps_<id>
-            for ex_id in request.POST.getlist('exercises'):
+            exercises_added = 0
+            for ex_id in selected_exercises:
                 try:
                     ex = Exercise.objects.get(pk=ex_id)
                 except Exercise.DoesNotExist:
@@ -158,11 +166,25 @@ def create_training_plan(request):
                     exercise=ex,
                     repetitions=reps
                 )
+                exercises_added += 1
+            
+            # Sprawdź czy faktycznie dodano jakieś ćwiczenia
+            if exercises_added == 0:
+                plan.delete()  # Usuń plan jeśli nie dodano żadnych ćwiczeń
+                messages.error(request, "Nie można utworzyć pustego planu treningowego. Wybierz przynajmniej jedno ćwiczenie.")
+                return redirect('home')
+            
+            messages.success(request, f"Plan treningowy '{plan.name}' został pomyślnie utworzony z {exercises_added} ćwiczeniami!")
+            return redirect('home')
+        else:
+            # Jeśli formularz jest nieprawidłowy, sprawdź czy problem to brak dni treningowych
+            if 'training_days' in form.errors:
+                messages.error(request, "Wybierz przynajmniej jeden dzień treningowy.")
+            else:
+                messages.error(request, "Sprawdź wprowadzone dane w formularzu.")
             return redirect('home')
 
     # Jeśli błąd w formularzu lub metoda inna niż POST, wracamy do 'home'
-    # Ponowne renderowanie 'home' z błędami formularza jest bardziej skomplikowane,
-    # więc dla uproszczenia przekierowujemy.
     return redirect('home')
 
 
@@ -177,6 +199,12 @@ def edit_training_plan(request, pk):
         return HttpResponseForbidden("Nie masz uprawnień do edycji tego planu.")
 
     if request.method == 'POST':
+        # Sprawdź czy wybrano jakiekolwiek ćwiczenia
+        selected_exercises = request.POST.getlist('exercises')
+        if not selected_exercises:
+            messages.error(request, "Nie można zapisać pustego planu treningowego. Wybierz przynajmniej jedno ćwiczenie.")
+            return redirect('home')
+        
         # Aktualizuj podstawowe dane planu
         plan.name = request.POST.get('name', plan.name)
         plan.intensity = request.POST.get('intensity', plan.intensity)
@@ -190,7 +218,8 @@ def edit_training_plan(request, pk):
         # Usuń stare ćwiczenia i dodaj nowe
         TrainingPlanExercise.objects.filter(training_plan=plan).delete()
 
-        for ex_id in request.POST.getlist('exercises'):
+        exercises_added = 0
+        for ex_id in selected_exercises:
             try:
                 ex = Exercise.objects.get(pk=ex_id)
             except Exercise.DoesNotExist:
@@ -209,10 +238,16 @@ def edit_training_plan(request, pk):
                 exercise=ex,
                 repetitions=reps
             )
+            exercises_added += 1
+        
+        # Sprawdź czy faktycznie dodano jakieś ćwiczenia
+        if exercises_added == 0:
+            messages.error(request, "Nie można zapisać pustego planu treningowego. Wybierz przynajmniej jedno ćwiczenie.")
+            return redirect('home')
+        
+        messages.success(request, f"Plan treningowy '{plan.name}' został pomyślnie zaktualizowany!")
         return redirect('home')
 
-    # Ta ścieżka (GET lub błąd formularza) nie jest używana przy podejściu z popupem,
-    # ale można ją zaimplementować do osobnej strony edycji.
     return redirect('home')
 
 
