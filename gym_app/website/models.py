@@ -12,19 +12,19 @@ class Exercise(models.Model):
 
 class TrainingPlan(models.Model):
     INTENSITY_CHOICES = [
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
+        ('low', 'Niska'),
+        ('medium', 'Średnia'),
+        ('high', 'Wysoka'),
     ]
 
     DAYS_OF_WEEK = [
-        ('mon', 'Monday'),
-        ('tue', 'Tuesday'),
-        ('wed', 'Wednesday'),
-        ('thu', 'Thursday'),
-        ('fri', 'Friday'),
-        ('sat', 'Saturday'),
-        ('sun', 'Sunday'),
+        ('mon', 'Poniedziałek'),
+        ('tue', 'Wtorek'),
+        ('wed', 'Środa'),
+        ('thu', 'Czwartek'),
+        ('fri', 'Piątek'),
+        ('sat', 'Sobota'),
+        ('sun', 'Niedziela'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Powiązanie z użytkownikiem
@@ -48,8 +48,8 @@ class TrainingPlan(models.Model):
     is_expert = models.BooleanField(default=False)
 
     def __str__(self):
-        days = ', '.join(self.training_days).title() if self.training_days else 'No days set'
-        return f'{self.name} - {self.get_intensity_display()} Intensity, Training Days: {days}'
+        days = ', '.join([dict(self.DAYS_OF_WEEK).get(day, day) for day in self.training_days]) if self.training_days else 'Brak dni'
+        return f'{self.name} - {self.get_intensity_display()}, Dni treningowe: {days}'
 
     def get_training_days_display(self):
         day_map = dict(self.DAYS_OF_WEEK)

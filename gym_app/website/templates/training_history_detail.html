@@ -1,0 +1,110 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Strona główna</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'training_history' %}">Historia treningów</a></li>
+                    <li class="breadcrumb-item active">Szczegóły treningu</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ completion.training_plan.name }}</h3>
+                    <p class="mb-0 text-muted">
+                        Wykonano: {{ completion.date_completed|date:"d.m.Y" }}
+                        {% if completion.user != request.user %}
+                            przez {{ completion.user.username }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h6>Intensywność</h6>
+                            <span class="badge 
+                                {% if completion.training_plan.intensity == 'low' %}bg-success
+                                {% elif completion.training_plan.intensity == 'medium' %}bg-warning
+                                {% else %}bg-danger{% endif %} fs-6">
+                                {{ completion.training_plan.get_intensity_display }}
+                            </span>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Dni treningowe</h6>
+                            {% if completion.training_plan.training_days %}
+                                {% for day in completion.training_plan.training_days %}
+                                    <span class="badge bg-secondary me-1">{{ day|title }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">Nie określono</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Liczba ćwiczeń</h6>
+                            <span class="fs-5">{{ plan_exercises.count }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if completion.training_plan.notes %}
+                    <div class="alert alert-info">
+                        <h6>Notatki użytkownika:</h6>
+                        <p class="mb-0">{{ completion.training_plan.notes|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if completion.training_plan.trainer_notes %}
+                    <div class="alert alert-warning">
+                        <h6>Notatki trenera:</h6>
+                        <p class="mb-0">{{ completion.training_plan.trainer_notes|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <h5>Ćwiczenia w planie</h5>
+                    {% if plan_exercises %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Ćwiczenie</th>
+                                        <th>Liczba powtórzeń</th>
+                                        <th>Opis</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for plan_exercise in plan_exercises %}
+                                    <tr>
+                                        <td><strong>{{ plan_exercise.exercise.name }}</strong></td>
+                                        <td>{{ plan_exercise.repetitions }}</td>
+                                        <td>
+                                            {% if plan_exercise.exercise.description %}
+                                                {{ plan_exercise.exercise.description|truncatewords:20 }}
+                                            {% else %}
+                                                <span class="text-muted">Brak opisu</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            Brak ćwiczeń w tym planie treningowym.
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'training_history' %}" class="btn btn-secondary">
+                            &larr; Powrót do historii
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

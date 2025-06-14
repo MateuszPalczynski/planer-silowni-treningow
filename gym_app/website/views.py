@@ -126,9 +126,16 @@ def create_training_plan(request):
                     exercise=tpe.exercise,
                     repetitions=tpe.repetitions
                 )
+            messages.success(request, f"Plan treningowy '{new_plan.name}' został pomyślnie skopiowany!")
             return redirect('home')
 
         # Przypadek 2: Użytkownik tworzy plan od podstaw
+        # Najpierw sprawdź czy wybrano ćwiczenia (przed walidacją formularza)
+        selected_exercises = request.POST.getlist('exercises')
+        if not selected_exercises:
+            messages.error(request, "Nie można utworzyć pustego planu treningowego. Wybierz przynajmniej jedno ćwiczenie.")
+            return redirect('home')
+        
         form = TrainingPlanForm(request.POST)
         if form.is_valid():
             plan = form.save(commit=False)
@@ -139,7 +146,8 @@ def create_training_plan(request):
             plan.save()
 
             # Dla każdego zaznaczonego ex_id pobieramy wartość reps_<id>
-            for ex_id in request.POST.getlist('exercises'):
+            exercises_added = 0
+            for ex_id in selected_exercises:
                 try:
                     ex = Exercise.objects.get(pk=ex_id)
                 except Exercise.DoesNotExist:
@@ -158,11 +166,25 @@ def create_training_plan(request):
                     exercise=ex,
                     repetitions=reps
                 )
+                exercises_added += 1
+            
+            # Sprawdź czy faktycznie dodano jakieś ćwiczenia
+            if exercises_added == 0:
+                plan.delete()  # Usuń plan jeśli nie dodano żadnych ćwiczeń
+                messages.error(request, "Nie można utworzyć pustego planu treningowego. Wybierz przynajmniej jedno ćwiczenie.")
+                return redirect('home')
+            
+            messages.success(request, f"Plan treningowy '{plan.name}' został pomyślnie utworzony z {exercises_added} ćwiczeniami!")
+            return redirect('home')
+        else:
+            # Jeśli formularz jest nieprawidłowy, sprawdź czy problem to brak dni treningowych
+            if 'training_days' in form.errors:
+                messages.error(request, "Wybierz przynajmniej jeden dzień treningowy.")
+            else:
+                messages.error(request, "Sprawdź wprowadzone dane w formularzu.")
             return redirect('home')
 
     # Jeśli błąd w formularzu lub metoda inna niż POST, wracamy do 'home'
-    # Ponowne renderowanie 'home' z błędami formularza jest bardziej skomplikowane,
-    # więc dla uproszczenia przekierowujemy.
     return redirect('home')
 
 
@@ -177,6 +199,12 @@ def edit_training_plan(request, pk):
         return HttpResponseForbidden("Nie masz uprawnień do edycji tego planu.")
 
     if request.method == 'POST':
+        # Sprawdź czy wybrano jakiekolwiek ćwiczenia
+        selected_exercises = request.POST.getlist('exercises')
+        if not selected_exercises:
+            messages.error(request, "Nie można zapisać pustego planu treningowego. Wybierz przynajmniej jedno ćwiczenie.")
+            return redirect('home')
+        
         # Aktualizuj podstawowe dane planu
         plan.name = request.POST.get('name', plan.name)
         plan.intensity = request.POST.get('intensity', plan.intensity)
@@ -190,7 +218,8 @@ def edit_training_plan(request, pk):
         # Usuń stare ćwiczenia i dodaj nowe
         TrainingPlanExercise.objects.filter(training_plan=plan).delete()
 
-        for ex_id in request.POST.getlist('exercises'):
+        exercises_added = 0
+        for ex_id in selected_exercises:
             try:
                 ex = Exercise.objects.get(pk=ex_id)
             except Exercise.DoesNotExist:
@@ -209,10 +238,16 @@ def edit_training_plan(request, pk):
                 exercise=ex,
                 repetitions=reps
             )
+            exercises_added += 1
+        
+        # Sprawdź czy faktycznie dodano jakieś ćwiczenia
+        if exercises_added == 0:
+            messages.error(request, "Nie można zapisać pustego planu treningowego. Wybierz przynajmniej jedno ćwiczenie.")
+            return redirect('home')
+        
+        messages.success(request, f"Plan treningowy '{plan.name}' został pomyślnie zaktualizowany!")
         return redirect('home')
 
-    # Ta ścieżka (GET lub błąd formularza) nie jest używana przy podejściu z popupem,
-    # ale można ją zaimplementować do osobnej strony edycji.
     return redirect('home')
 
 
@@ -280,3 +315,107 @@ def mark_training_plan_done(request, plan_id):
         return redirect('home')
 
     return redirect('home')
+
+@login_required
+def training_history(request):
+    """
+    Widok do przeglądania historii wykonanych treningów użytkownika.
+    """
+    user = request.user
+    is_trainer = user.groups.filter(name='trener').exists()
+    
+    # Jeśli to trener, może przeglądać historię wszystkich użytkowników
+    if is_trainer:
+        completions = TrainingPlanCompletion.objects.select_related(
+            'training_plan', 'user'
+        ).order_by('-date_completed')
+        
+        # Filtrowanie po użytkowniku jeśli podano
+        user_filter = request.GET.get('user')
+        if user_filter:
+            completions = completions.filter(user__username__icontains=user_filter)
+    else:
+        # Zwykły użytkownik widzi tylko swoją historię
+        completions = TrainingPlanCompletion.objects.filter(
+            user=user
+        ).select_related('training_plan').order_by('-date_completed')
+    
+    # Filtrowanie po nazwie planu
+    plan_filter = request.GET.get('plan')
+    if plan_filter:
+        completions = completions.filter(training_plan__name__icontains=plan_filter)
+    
+    # Filtrowanie po dacie
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    if date_from:
+        try:
+            date_from_parsed = parse_date(date_from)
+            if date_from_parsed:
+                completions = completions.filter(date_completed__gte=date_from_parsed)
+        except:
+            pass
+    
+    if date_to:
+        try:
+            date_to_parsed = parse_date(date_to)
+            if date_to_parsed:
+                completions = completions.filter(date_completed__lte=date_to_parsed)
+        except:
+            pass
+    
+    # Paginacja - 20 rekordów na stronę
+    from django.core.paginator import Paginator
+    paginator = Paginator(completions, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Statystyki
+    total_completions = completions.count()
+    
+    # Najczęściej wykonywane plany
+    from django.db.models import Count
+    popular_plans = completions.values('training_plan__name').annotate(
+        count=Count('training_plan')
+    ).order_by('-count')[:5]
+    
+    context = {
+        'page_obj': page_obj,
+        'completions': page_obj,
+        'is_trainer': is_trainer,
+        'total_completions': total_completions,
+        'popular_plans': popular_plans,
+        'filters': {
+            'user': request.GET.get('user', ''),
+            'plan': request.GET.get('plan', ''),
+            'date_from': request.GET.get('date_from', ''),
+            'date_to': request.GET.get('date_to', ''),
+        }
+    }
+    
+    return render(request, 'training_history.html', context)
+
+@login_required  
+def training_history_detail(request, completion_id):
+    """
+    Widok do przeglądania szczegółów konkretnego wykonanego treningu.
+    """
+    completion = get_object_or_404(
+        TrainingPlanCompletion.objects.select_related('training_plan', 'user'),
+        id=completion_id
+    )
+    
+    # Sprawdź uprawnienia
+    if completion.user != request.user and not request.user.groups.filter(name='trener').exists():
+        return HttpResponseForbidden("Nie masz uprawnień do przeglądania tego treningu.")
+    
+    # Pobierz szczegóły planu treningowego
+    plan_exercises = completion.training_plan.trainingplanexercise_set.select_related('exercise').all()
+    
+    context = {
+        'completion': completion,
+        'plan_exercises': plan_exercises,
+    }
+    
+    return render(request, 'training_history_detail.html', context)

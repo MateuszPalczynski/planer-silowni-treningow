@@ -5,18 +5,30 @@
 <div class="container">
     <h1>Gym App</h1>
 
+    <!-- Wyświetlanie komunikatów -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     {% if user.is_authenticated %}
         <p>Witaj, {{ user.username }}!</p>
         <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <button type="submit" class="button logout">Wyloguj się</button>
         </form>
-        <button class="button add_plan" id="openPopupBtn" type="button">Add Training Plan</button>
+        <button class="button add_plan" id="openPopupBtn" type="button">Dodaj plan treningowy</button>
         {%if is_trainer %}
-        <button class="button expert_plan" id="openExpertPopupBtn" type="button">Add Expert Plan</button>
+        <button class="button expert_plan" id="openExpertPopupBtn" type="button">Dodaj plan ekspercki</button>
         {% else %}
-        <button class="button expert_plan" id="openChooseExpertPopupBtn" type="button">Choose Expert Plan</button>
+        <button class="button expert_plan" id="openChooseExpertPopupBtn" type="button">Wybierz plan ekspercki</button>
         {% endif %}
+        <a href="{% url 'training_history' %}" class="button history">Historia treningów</a>
     {% else %}
         <a href="{% url 'login' %}" class="button login">Zaloguj się</a>
         <a href="{% url 'register' %}" class="button register">Zarejestruj się</a>
@@ -92,7 +104,7 @@
             </form>
             <div class="plan-actions" style="position: absolute; top: 8px; right: 8px;">
                 <button type="submit" class="button edit-btn" data-plan-id="{{ plan.id }}">Edytuj</button>
-                <button type="submit" class="button mark-as-done" data-plan-id="{{ plan.id }}">Mark as done</button>
+                <button type="submit" class="button mark-as-done" data-plan-id="{{ plan.id }}">Oznacz jako wykonany</button>
                 <form method="post" action="{% url 'delete_training_plan' plan.id %}" class="delete-form" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="button delete-btn">Usuń</button>
@@ -128,14 +140,14 @@
 <div id="popup" class="popup" style="display: none;">
     <div class="popup-content" style="max-height: 60vh; overflow-y: auto;">
         <span class="close" id="closePopupBtn">&times;</span>
-        <h2 id = "popupTitle">Create a New Training Plan</h2>
+        <h2 id = "popupTitle">Utwórz nowy plan treningowy</h2>
         <form id="trainingPlanForm" method="POST" action="{% url 'create_training_plan' %}">
             {% csrf_token %}
             {{ form.is_expert }}
-            <label>Plan Name:</label><br>
+            <label>Nazwa planu:</label><br>
             {{ form.name }}<br><br>
 
-            <label>Choose Exercises:</label>
+            <label>Wybierz ćwiczenia:</label>
             <ul style="list-style: none; padding: 0; margin: 0;">
                 {% for ex in all_exercises %}
                 <li style="margin-bottom: 8px;">
@@ -155,13 +167,13 @@
             </ul>
             <br>
 
-            <label>Level of Intensity:</label><br>
+            <label>Poziom intensywności:</label><br>
             {{ form.intensity }}<br><br>
 
-            <label>Days of week:</label><br>
+            <label>Dni tygodnia:</label><br>
             {{ form.training_days }}<br><br>
 
-            <button type="submit">Save Plan</button>
+            <button type="submit">Zapisz plan</button>
         </form>
     </div>
 </div>
@@ -175,10 +187,10 @@
             {% csrf_token %}
             <input type="hidden" id="editPlanId" name="plan_id" value="">
             
-            <label>Plan Name:</label><br>
+            <label>Nazwa planu:</label><br>
             <input type="text" id="editPlanName" name="name" required style="width: 100%; margin-bottom: 10px;"><br>
 
-            <label>Choose Exercises:</label>
+            <label>Wybierz ćwiczenia:</label>
             <ul id="editExercisesList" style="list-style: none; padding: 0; margin: 0;">
                 {% for ex in all_exercises %}
                 <li style="margin-bottom: 8px;">
@@ -197,14 +209,14 @@
             </ul>
             <br>
 
-            <label>Level of Intensity:</label><br>
+            <label>Poziom intensywności:</label><br>
             <select id="editIntensity" name="intensity" style="width: 100%; margin-bottom: 10px;">
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
             </select><br>
 
-            <label>Days of week:</label><br>
+            <label>Dni tygodnia:</label><br>
             <select id="editTrainingDays" name="training_days" multiple style="width: 100%; margin-bottom: 10px;">
                 <option value="mon">Monday</option>
                 <option value="tue">Tuesday</option>
@@ -223,7 +235,7 @@
 <div id="popupExpertPlans" class="popup" style="display: none;">
     <div class="popup-content" style="max-height: 60vh; overflow-y: auto;">
         <span class="close" id="closeChooseExpertPopupBtn">&times;</span>
-        <h2 id = "popupTitle">Choose Expert Plan</h2>
+        <h2 id = "popupTitle">Wybierz plan ekspercki</h2>
         {% for expert_plan in expert_plans %}
         <div class="expert-plan">
         <form id="trainingPlanForm" method="POST" action="{% url 'create_training_plan' %}">
@@ -252,7 +264,7 @@
         </div>
 
             <input type="hidden" name="plan_id" value="{{ expert_plan.id }}">
-            <button type="submit">Choose Plan</button>
+            <button type="submit">Wybierz plan</button>
         </form>
         </div>
         {% endfor %}
@@ -267,13 +279,13 @@
 <div id="markDonePopup" class="popup" style="display:none;">
     <div class="popup-content">
         <span class="close" id="closeMarkDonePopup">&times;</span>
-        <h2>Mark Training Plan as Done</h2>
+        <h2>Oznacz plan jako wykonany</h2>
         <form id="markDoneForm" method="post" action="">
             {% csrf_token %}
-            <label for="done_date">Select date:</label>
+            <label for="done_date">Wybierz datę:</label>
             <input type="date" id="done_date" name="done_date" required><br><br>
-            <button type="submit" class="button">Submit</button>
-            <button type="button" class="button" id="cancelMarkDone">Cancel</button>
+            <button type="submit" class="button">Zapisz</button>
+            <button type="button" class="button" id="cancelMarkDone">Anuluj</button>
         </form>
     </div>
 </div>
@@ -281,7 +293,33 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-const markDoneButtons = document.querySelectorAll('button.mark-as-done');
+    // Walidacja formularza przed wysłaniem
+    const trainingPlanForm = document.getElementById('trainingPlanForm');
+    if (trainingPlanForm) {
+        trainingPlanForm.addEventListener('submit', function(e) {
+            const checkboxes = trainingPlanForm.querySelectorAll('input[name="exercises"]:checked');
+            if (checkboxes.length === 0) {
+                e.preventDefault();
+                alert('Wybierz przynajmniej jedno ćwiczenie, aby utworzyć plan treningowy!');
+                return false;
+            }
+        });
+    }
+
+    // Walidacja formularza edycji
+    const editTrainingPlanForm = document.getElementById('editTrainingPlanForm');
+    if (editTrainingPlanForm) {
+        editTrainingPlanForm.addEventListener('submit', function(e) {
+            const checkboxes = editTrainingPlanForm.querySelectorAll('input[name="exercises"]:checked');
+            if (checkboxes.length === 0) {
+                e.preventDefault();
+                alert('Wybierz przynajmniej jedno ćwiczenie, aby zapisać plan treningowy!');
+                return false;
+            }
+        });
+    }
+
+    const markDoneButtons = document.querySelectorAll('button.mark-as-done');
     const popup = document.getElementById('markDonePopup');
     const closeBtn = document.getElementById('closeMarkDonePopup');
     const cancelBtn = document.getElementById('cancelMarkDone');

@@ -14,14 +14,14 @@ class TrainingPlanForm(forms.ModelForm):
         choices=TrainingPlan.INTENSITY_CHOICES,
         initial='medium',
         widget=forms.Select(attrs={'class': 'form-select'}),
-        label='Level of Intensity'
+        label='Poziom intensywności'
     )
 
     training_days = forms.MultipleChoiceField(
         choices=TrainingPlan.DAYS_OF_WEEK,
         widget=forms.SelectMultiple,
-        label='Training Days',
-        required=True
+        label='Dni treningowe',
+        required=False  # Zmienione na False, jeśli chcesz uczynić opcjonalnym
     )
 
     is_expert = forms.BooleanField(
