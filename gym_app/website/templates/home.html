@@ -90,10 +90,9 @@
                 </div>
                 <button type="submit" class="button save-btn">Zapisz</button>
             </form>
-            <div class="plan-actions" style="position: absolute; top: 8px; right: 8px; display: none;">
-                <button type="button" class="button edit-btn" data-plan-id="{{ plan.id }}">Edytuj</button>
             <div class="plan-actions" style="position: absolute; top: 8px; right: 8px;">
-                <button type="submit" class="button" data-plan-id="{{ plan.id }}">Mark as done</button>
+                <button type="submit" class="button edit-btn" data-plan-id="{{ plan.id }}">Edytuj</button>
+                <button type="submit" class="button mark-as-done" data-plan-id="{{ plan.id }}">Mark as done</button>
                 <form method="post" action="{% url 'delete_training_plan' plan.id %}" class="delete-form" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="button delete-btn">Usuń</button>
@@ -282,7 +281,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const markDoneButtons = document.querySelectorAll('button[data-plan-id]');
+const markDoneButtons = document.querySelectorAll('button.mark-as-done');
     const popup = document.getElementById('markDonePopup');
     const closeBtn = document.getElementById('closeMarkDonePopup');
     const cancelBtn = document.getElementById('cancelMarkDone');
