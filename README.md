@@ -30,33 +30,33 @@ aby nie zapominać o planowanych ćwiczeniach.~~
 chcę mieć możliwość przeglądania planów moich podopiecznych,
 aby skuteczniej monitorować ich postępy i sugerować zmiany.~~
 
-**Jako użytkownik
+~~Jako użytkownik
 chcę móc edytować i usuwać ćwiczenia w planie treningowym,
-aby dostosować go do moich aktualnych potrzeb i postępów.**
+aby dostosować go do moich aktualnych potrzeb i postępów.~~
 
-Jako użytkownik
+~~Jako użytkownik
 chcę mieć możliwość zapisania historii swoich treningów,
-aby móc śledzić postępy i analizować swoje osiągnięcia.
+aby móc śledzić postępy i analizować swoje osiągnięcia.~~
 
-**Jako użytkownik
+~~Jako użytkownik
 chcę móc określić poziom intensywności treningu i liczbę powtórzeń dla każdego ćwiczenia,
-aby lepiej dostosować plan do swoich możliwości.**
+aby lepiej dostosować plan do swoich możliwości.~~
 
 Jako użytkownik
 chcę móc generować raporty z wykonanych treningów,
 aby mieć podgląd na swoje statystyki i rozwój.
 
-Jako użytkownik
+~~Jako użytkownik
 chcę móc wybrać gotowy plan treningowy stworzony przez specjalistów,
-aby szybko rozpocząć ćwiczenia bez konieczności ręcznego układania planu.
+aby szybko rozpocząć ćwiczenia bez konieczności ręcznego układania planu.~~
 
-Jako trener personalny
+~~Jako trener personalny
 chcę móc dodawać rekomendowane plany treningowe,
-aby moi podopieczni mieli dostęp do profesjonalnych programów ćwiczeń.
+aby moi podopieczni mieli dostęp do profesjonalnych programów ćwiczeń.~~
 
-Jako administrator systemu
+~~Jako administrator systemu
 chcę mieć możliwość monitorowania aktywności użytkowników,
-aby wykrywać nieprawidłowości i reagować na ewentualne problemy.
+aby wykrywać nieprawidłowości i reagować na ewentualne problemy.~~
 
 Jako użytkownik
 chcę móc synchronizować dane z zewnętrznymi aplikacjami fitness,
