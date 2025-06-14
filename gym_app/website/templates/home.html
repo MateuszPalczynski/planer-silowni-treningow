@@ -91,7 +91,8 @@
                 <button type="submit" class="button save-btn">Zapisz</button>
             </form>
             <div class="plan-actions" style="position: absolute; top: 8px; right: 8px;">
-                <button type="submit" class="button" data-plan-id="{{ plan.id }}">Mark as done</button>
+                <button type="submit" class="button edit-btn" data-plan-id="{{ plan.id }}">Edytuj</button>
+                <button type="submit" class="button mark-as-done" data-plan-id="{{ plan.id }}">Mark as done</button>
                 <form method="post" action="{% url 'delete_training_plan' plan.id %}" class="delete-form" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="button delete-btn">Usuń</button>
@@ -165,6 +166,60 @@
     </div>
 </div>
 
+<!-- Popup do edycji planu treningowego -->
+<div id="editPopup" class="popup" style="display: none;">
+    <div class="popup-content" style="max-height: 60vh; overflow-y: auto;">
+        <span class="close" id="closeEditPopupBtn">&times;</span>
+        <h2>Edytuj Plan Treningowy</h2>
+        <form id="editTrainingPlanForm" method="POST">
+            {% csrf_token %}
+            <input type="hidden" id="editPlanId" name="plan_id" value="">
+            
+            <label>Plan Name:</label><br>
+            <input type="text" id="editPlanName" name="name" required style="width: 100%; margin-bottom: 10px;"><br>
+
+            <label>Choose Exercises:</label>
+            <ul id="editExercisesList" style="list-style: none; padding: 0; margin: 0;">
+                {% for ex in all_exercises %}
+                <li style="margin-bottom: 8px;">
+                    <label style="font-weight: bold;">
+                        <input type="checkbox" name="exercises" value="{{ ex.id }}" id="edit_ex_{{ ex.id }}"> {{ ex.name }}
+                    </label>
+                    <input type="number"
+                           name="reps_{{ ex.id }}"
+                           id="edit_reps_{{ ex.id }}"
+                           min="1"
+                           placeholder="Powtórzeń"
+                           style="width: 80px; margin-left: 12px;"
+                           value="10">
+                </li>
+                {% endfor %}
+            </ul>
+            <br>
+
+            <label>Level of Intensity:</label><br>
+            <select id="editIntensity" name="intensity" style="width: 100%; margin-bottom: 10px;">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select><br>
+
+            <label>Days of week:</label><br>
+            <select id="editTrainingDays" name="training_days" multiple style="width: 100%; margin-bottom: 10px;">
+                <option value="mon">Monday</option>
+                <option value="tue">Tuesday</option>
+                <option value="wed">Wednesday</option>
+                <option value="thu">Thursday</option>
+                <option value="fri">Friday</option>
+                <option value="sat">Saturday</option>
+                <option value="sun">Sunday</option>
+            </select><br><br>
+
+            <button type="submit">Zapisz zmiany</button>
+        </form>
+    </div>
+</div>
+
 <div id="popupExpertPlans" class="popup" style="display: none;">
     <div class="popup-content" style="max-height: 60vh; overflow-y: auto;">
         <span class="close" id="closeChooseExpertPopupBtn">&times;</span>
@@ -204,6 +259,11 @@
     </div>
 </div>
 
+<!-- Dodanie danych planów jako JSON dla JavaScript -->
+<script id="training-plans-data" type="application/json">
+  {{ training_plans_json|safe }}
+</script>
+
 <div id="markDonePopup" class="popup" style="display:none;">
     <div class="popup-content">
         <span class="close" id="closeMarkDonePopup">&times;</span>
@@ -221,7 +281,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const markDoneButtons = document.querySelectorAll('button[data-plan-id]');
+const markDoneButtons = document.querySelectorAll('button.mark-as-done');
     const popup = document.getElementById('markDonePopup');
     const closeBtn = document.getElementById('closeMarkDonePopup');
     const cancelBtn = document.getElementById('cancelMarkDone');
