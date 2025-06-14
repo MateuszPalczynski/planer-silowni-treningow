@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.conf import settings
 
 class Exercise(models.Model):
     name = models.CharField(max_length=200)
@@ -66,3 +66,15 @@ class TrainingPlanExercise(models.Model):
 
     def __str__(self):
         return f"{self.training_plan.name} – {self.exercise.name}: {self.repetitions} reps"
+
+class TrainingPlanCompletion(models.Model):
+    training_plan = models.ForeignKey('TrainingPlan', on_delete=models.CASCADE, related_name='completions')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    date_completed = models.DateField()
+
+    class Meta:
+        unique_together = ('training_plan', 'user', 'date_completed')
+        ordering = ['-date_completed']
+
+    def __str__(self):
+        return f"{self.user} completed {self.training_plan} on {self.date_completed}"

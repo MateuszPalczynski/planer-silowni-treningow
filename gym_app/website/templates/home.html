@@ -92,6 +92,8 @@
             </form>
             <div class="plan-actions" style="position: absolute; top: 8px; right: 8px; display: none;">
                 <button type="button" class="button edit-btn" data-plan-id="{{ plan.id }}">Edytuj</button>
+            <div class="plan-actions" style="position: absolute; top: 8px; right: 8px;">
+                <button type="submit" class="button" data-plan-id="{{ plan.id }}">Mark as done</button>
                 <form method="post" action="{% url 'delete_training_plan' plan.id %}" class="delete-form" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="button delete-btn">Usuń</button>
@@ -260,7 +262,55 @@
 
 <!-- Dodanie danych planów jako JSON dla JavaScript -->
 <script id="training-plans-data" type="application/json">
-{{ training_plans_json|safe }}
+  {{ training_plans_json|safe }}
+</script>
+
+<div id="markDonePopup" class="popup" style="display:none;">
+    <div class="popup-content">
+        <span class="close" id="closeMarkDonePopup">&times;</span>
+        <h2>Mark Training Plan as Done</h2>
+        <form id="markDoneForm" method="post" action="">
+            {% csrf_token %}
+            <label for="done_date">Select date:</label>
+            <input type="date" id="done_date" name="done_date" required><br><br>
+            <button type="submit" class="button">Submit</button>
+            <button type="button" class="button" id="cancelMarkDone">Cancel</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const markDoneButtons = document.querySelectorAll('button[data-plan-id]');
+    const popup = document.getElementById('markDonePopup');
+    const closeBtn = document.getElementById('closeMarkDonePopup');
+    const cancelBtn = document.getElementById('cancelMarkDone');
+    const form = document.getElementById('markDoneForm');
+
+    markDoneButtons.forEach(button => {
+        button.addEventListener('click', () => {
+        const planId = button.getAttribute('data-plan-id');
+        form.action = `/training/mark_done/${planId}/`;  // Update form action URL with plan id
+        popup.style.display = 'block';
+        });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        popup.style.display = 'none';
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        popup.style.display = 'none';
+    });
+
+    // Optional: Close popup if clicked outside of the content
+    window.addEventListener('click', (event) => {
+        if (event.target === popup) {
+        popup.style.display = 'none';
+        }
+    });
+});
 </script>
 
 <script src="{% static 'js/home.js' %}"></script>
